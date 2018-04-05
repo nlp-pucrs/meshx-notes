@@ -1,0 +1,18 @@
+{% extends 'bootstrap.html' %}
+
+{% load bootstrap4 %}
+
+{% block bootstrap4_extra_head %}
+	<title>DDC Demo</title>
+{% endblock %}
+
+{% block bootstrap4_content %}
+    <div class="container">
+        <h1>{% block title %}(no title){% endblock %}</h1>
+
+        {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
+
+        {% block content %}(no content){% endblock %}
+    </div>
+
+{% endblock %}

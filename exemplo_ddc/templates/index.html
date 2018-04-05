@@ -1,0 +1,44 @@
+{% extends 'base-no-header.html' %}
+
+{% load bootstrap4 %}
+
+{% block title %}
+    Prescrições Fora do Padrão
+{% endblock %}
+
+{% block content %}
+
+<nav class="navbar navbar-light justify-content-between" style="background-color: #e3f2fd;">
+    <a class="navbar-brand">Pesquisa:</a>
+    <form class="form-inline" method="GET" action="">
+        <input class="form-control mr-sm-2" type="date" name="dt" value="{{dt}}">
+	<input class="form-control mr-sm-2" type="text" placeholder="Medicamento" name="m" value="{{m}}">
+	<input class="form-control mr-sm-2" type="number" placeholder="Escore" name="s" value="{{s}}">
+	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
+    </form>
+</nav>
+
+    <table class="table table-striped table-hover">
+	    <thead class="table-active">
+		    <tr>
+			    <th>Paciente</th>
+			    <th>Data Prescrição</th>
+			    <th>Score</th>
+		    </tr>
+	    </thead>
+	    <tbody>
+	        {% for tag, reg, data, score in prescriptions %}
+		  <tr class="
+		         {% if score > 9 %} table-danger {% endif %}
+			 {% if score > 5 and score < 10 %} table-warning {% endif %}
+			 " data-href="/ddc/p?tag={{tag}}&data={{data}}">
+			<th scope="row">{{ tag }}</th>
+		        <td>{{ data }}</td>
+			<td>{{ score }}</td>
+		   </tr>		     
+        	{% endfor %}	    
+	    </tbody>
+    </table>
+
+{% endblock %}
+
