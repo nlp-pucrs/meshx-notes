@@ -1,0 +1,18 @@
+<!doctype html>
+<html >
+  <head>
+  </head>
+  <body>
+
+    <h1>
+
+      {% block title %}
+
+        {% for dado in prescription %}
+           {{ dado }}<br/><br/>
+        {% endfor %}
+
+      {% endblock %}
+</h1>
+  </body>
+</html>

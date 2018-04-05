@@ -27,8 +27,8 @@ class IndexPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexPageView, self).get_context_data(**kwargs)
-        dirspot = os.path.abspath(os.path.dirname(__file__))
-        prescription = pd.read_csv(dirspot + '/prescription_score_cooc.csv.gz', compression='gzip', nrows=50000)
+        #dirspot = os.path.abspath(os.path.dirname(__file__))
+        prescription = pd.read_csv('./prescription_score_cooc.csv.gz', compression='gzip', nrows=50000)
         prescription_filter = prescription
 
         dt = self.request.GET.get('dt','')
