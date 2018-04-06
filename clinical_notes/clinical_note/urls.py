@@ -19,5 +19,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^', include('clinical_tinder.urls'), name='home'),
     path('polls/', include('polls.urls')),
 ]
