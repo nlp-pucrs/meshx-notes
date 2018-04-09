@@ -1,8 +1,6 @@
 
 ####
-
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models.fields.files import FieldFile
 from django.views.generic import FormView
 from django.contrib import messages
 
@@ -15,46 +13,18 @@ from django.views.generic.base import TemplateView
 from django.template import loader
 
 import pandas as pd
-#from polls.models import Paciente
 
-"""
- 
-#our view which is a function named index
-
-def index(request):
-    
-    #getting our template 
-    template = loader.get_template('index.html')
-    context = super(index, self).index(**kwargs)
-
-    #Pegando os dados da tabela
-	ea = pd.read_csv('excel_ea.csv.gz', compression='gzip')
-
-	paciente = Paciente()
-
-	for idx in ea.index:
-		paciente.data_paciente =  ea.loc[idx,'DATA']
-		paciente.tipo =  ea.loc[idx,'TIPO']
-		paciente.resumo_evento =  ea.loc[idx,'RESUMO DO EVENTO']
-		paciente.registro =  ea.loc[idx,'REGISTRO']
-		paciente.evento =  ea.loc[idx,'EVENTO']
-		paciente.sexo =  ea.loc[idx,'SEXO']
-		paciente.id_paciente =  ea.loc[idx,'ID']
-		paciente.gravidade =  ea.loc[idx,'GRAVIDADE']
-    
-    #rendering the template in HttpResponse
-    return HttpResponse(template.render())
-"""
 
 class PacientePageView(TemplateView):
-    template_name = 'index.html'
+	template_name = 'index.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(PacientePageView, self).get_context_data(**kwargs)
+
+	def get_context_data(self, **kwargs):
+		context = super(PacientePageView, self).get_context_data(**kwargs)
 
         #dirspot = os.path.abspath(os.path.dirname(__file__))
 
-        prescription = pd.read_csv('./excel_ea.csv.gz', compression='gzip', nrows=50000)
+		prescription = pd.read_csv('./excel_evol.csv.gz', compression='gzip', nrows=50000)
 
         #tag = self.request.GET.get('tag')
         #reg = tag
@@ -63,15 +33,31 @@ class PacientePageView(TemplateView):
 
         #idList = prescription[(prescription['REG. PACIENTE'] == int(reg)) & (prescription['DATA PRESC'] == data)].index
 
-        p = []
-        for idx in prescription.index:
-            m = prescription.loc[idx] #valor que ha' aqui
-            p.append([ m['DATA'], m['TIPO'], m['RESUMO DO EVENTO'], m['REGISTRO'], int(m['EVENTO']), m['SEXO'], int(m['ID']), m['GRAVIDADE'] ])
+		p = []
+		c = []
+		for idx in prescription.index:
+			m = prescription.loc[idx] #valor que ha' aqui
+            #p.append([ prescription.columns[0], m['DATA'], prescription.columns[1], m['TIPO'], prescription.columns[2], m['RESUMO DO EVENTO'], prescription.columns[3], m['REGISTRO'],  prescription.columns[4], int(m['EVENTO']), prescription.columns[5], m['SEXO'], prescription.columns[6],  int(m['ID']), prescription.columns[7],  m['GRAVIDADE'] ])
+            #p.append([m['DATA'], m['TIPO'], m['RESUMO DO EVENTO'], m['REGISTRO'],  int(m['EVENTO']), m['SEXO'], int(m['ID']), m['GRAVIDADE'] ])
+            #c.append(prescription.columns[0], prescription.columns[1], prescription.columns[2], prescription.columns[3], prescription.columns[4], prescription.columns[5], prescription.columns[6], prescription.columns[7])
+
+			tamanho = prescription.shape[1]
+			i=0
+			for i in range(tamanho):
+				p.append([prescription.columns[i].title()+": ", m[i] ])
+				i+=1
+			p.append([".fim." ])
+
+            #p.append([m['DATA'], m['TIPO'], m['RESUMO DO EVENTO'], m['REGISTRO'],  int(m['EVENTO']), m['SEXO'], int(m['ID']), m['GRAVIDADE'] ])
+            #c.append(prescription.columns[0], prescription.columns[1], prescription.columns[2], prescription.columns[3], prescription.columns[4], prescription.columns[5], prescription.columns[6], prescription.columns[7])
+
+            #j1 = sorted(p, key=lambda m: m[8], reverse=True)
+            #j2 = sorted(c, key=lambda c: m[8], reverse=True)
+            #junto = zip(c, p)
 
         #tag = int(reg/10)
         #context['tag'] = self.request.GET.get('tag')
         #context['data'] = data
-        context['prescription'] = sorted(p, key=lambda m: m[7], reverse=True)
-        context['teste'] = "Estou aqui testando e deu tudo certo!"
+		context['prescription'] = p
 
-        return context
+		return context

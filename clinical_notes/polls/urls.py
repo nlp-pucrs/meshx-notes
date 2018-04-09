@@ -13,5 +13,5 @@ from . import views
 from polls.views import PacientePageView
 
 urlpatterns = [
-    path('', PacientePageView.as_view(), name='index'),
+	path('', PacientePageView.as_view(), name='index'),
 ]

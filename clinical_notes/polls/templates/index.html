@@ -4,15 +4,20 @@
   </head>
   <body>
 
-    <h1>
+    <div>
 
       {% block title %}
 
         {% for dado in prescription %}
-           {{ dado }}<br/><br/>
+           {% if dado.0 != ".fim." %}
+               {{dado.0}}{{dado.1}} <br/><br/>
+            {% else %}
+              <br><br><br>
+           {% endif %}
         {% endfor %}
 
       {% endblock %}
-</h1>
+
+  </div>
   </body>
 </html>
