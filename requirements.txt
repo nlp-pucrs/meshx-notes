@@ -1,0 +1,7 @@
+django-fa
+django
+django-bootstrap4
+pandas
+gensim
+sklearn
+jupyter
