@@ -8,7 +8,9 @@ Como instanciar o projeto:
     No diretório criado no passo anterior (dentro do terminal) executar o comando: "git clone https://github.com/nlp-pucrs/clinical-notes-web.git".
 
     Ainda no terminal: "cd clinical-notes-web/clinical_notes"
-
+    
+        "pip install -r requirements.txt" para instalar todos os pacotes que são necessários paras a aplicação poder ser executada.
+    
     Finalmente, para executar o servidor: 
     *A versão do Python deve ser 3 ou superior.
     
