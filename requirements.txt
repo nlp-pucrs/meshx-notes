@@ -1,4 +1,3 @@
-django-fa
 django
 django-bootstrap4
 pandas
