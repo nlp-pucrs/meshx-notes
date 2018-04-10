@@ -29,8 +29,9 @@ class PacientePageView(TemplateView):
 		m= prescription.loc[0] #valor que ha' aqui
 
 		#evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
-		evolucao = ['Fragilidade', 'Maionese']
 		#Passando pelo xml
+
+		evolucao = 	['Medicina do Vício', 'Medicina do Adolescente', 'Medicina', 'Acinetobacter', 'Febre']
 
 		with gzip.open('./pordesc2018-small.xml.gz') as pordesc2018:
 			tree = ET.parse(pordesc2018)
@@ -43,10 +44,11 @@ class PacientePageView(TemplateView):
 					descriptor = tree.find("./DescriptorRecord/[DescriptorUI='"+DUI+"']")
 					name = descriptor.find('.DescriptorName/String').text
 					scope = descriptor.find('.ConceptList/Concept/ScopeNote').text
-
-					evolucao[cont] = '<a data-ui="'+DUI+'" data-scope="'+scope+'">'+name+'</a>'
+					evolucao[cont] = '<a href="#" data-ui="'+DUI+'" data-scope="'+scope+'">'+palavra+'</a>'
+					cont +=1
+					continue
 				cont +=1
-		strr = ''.join(evolucao)
+		strr = ' '.join(evolucao)
 
 		
 		context['data'] = m['REG. PACIENTE']
