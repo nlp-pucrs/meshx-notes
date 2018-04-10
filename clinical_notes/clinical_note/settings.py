@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'fa',
     'clinical_tinder',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
