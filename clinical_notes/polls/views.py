@@ -1,5 +1,3 @@
-
-####
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import FormView
 from django.contrib import messages
@@ -14,6 +12,10 @@ from django.template import loader
 
 import pandas as pd
 
+import gzip
+import xml.etree.ElementTree as ET
+import string
+
 
 class PacientePageView(TemplateView):
 	template_name = 'index.html'
@@ -22,42 +24,32 @@ class PacientePageView(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
-        #dirspot = os.path.abspath(os.path.dirname(__file__))
-
 		prescription = pd.read_csv('./excel_evol.csv.gz', compression='gzip', nrows=50000)
 
-        #tag = self.request.GET.get('tag')
-        #reg = tag
+		m= prescription.loc[0] #valor que ha' aqui
 
-        #data = self.request.GET.get('data')
+		#evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
+		evolucao = ['Fragilidade', 'Maionese']
+		#Passando pelo xml
 
-        #idList = prescription[(prescription['REG. PACIENTE'] == int(reg)) & (prescription['DATA PRESC'] == data)].index
+		with gzip.open('./pordesc2018-small.xml.gz') as pordesc2018:
+			tree = ET.parse(pordesc2018)
 
-		p = []
-		c = []
-		for idx in prescription.index:
-			m = prescription.loc[idx] #valor que ha' aqui
-            #p.append([ prescription.columns[0], m['DATA'], prescription.columns[1], m['TIPO'], prescription.columns[2], m['RESUMO DO EVENTO'], prescription.columns[3], m['REGISTRO'],  prescription.columns[4], int(m['EVENTO']), prescription.columns[5], m['SEXO'], prescription.columns[6],  int(m['ID']), prescription.columns[7],  m['GRAVIDADE'] ])
-            #p.append([m['DATA'], m['TIPO'], m['RESUMO DO EVENTO'], m['REGISTRO'],  int(m['EVENTO']), m['SEXO'], int(m['ID']), m['GRAVIDADE'] ])
-            #c.append(prescription.columns[0], prescription.columns[1], prescription.columns[2], prescription.columns[3], prescription.columns[4], prescription.columns[5], prescription.columns[6], prescription.columns[7])
+		cont = 0
+		for palavra in evolucao:
+				elem = tree.find("./DescriptorRecord/*/*/*/*/[String='"+palavra.title()+"']/../../../../")
+				if elem is not None:
+					DUI = elem.text
+					descriptor = tree.find("./DescriptorRecord/[DescriptorUI='"+DUI+"']")
+					name = descriptor.find('.DescriptorName/String').text
+					scope = descriptor.find('.ConceptList/Concept/ScopeNote').text
 
-			tamanho = prescription.shape[1]
-			i=0
-			for i in range(tamanho):
-				p.append([prescription.columns[i].title()+": ", m[i] ])
-				i+=1
-			p.append([".fim." ])
+					evolucao[cont] = '<a data-ui="'+DUI+'" data-scope="'+scope+'">'+name+'</a>'
+				cont +=1
+		strr = ''.join(evolucao)
 
-            #p.append([m['DATA'], m['TIPO'], m['RESUMO DO EVENTO'], m['REGISTRO'],  int(m['EVENTO']), m['SEXO'], int(m['ID']), m['GRAVIDADE'] ])
-            #c.append(prescription.columns[0], prescription.columns[1], prescription.columns[2], prescription.columns[3], prescription.columns[4], prescription.columns[5], prescription.columns[6], prescription.columns[7])
-
-            #j1 = sorted(p, key=lambda m: m[8], reverse=True)
-            #j2 = sorted(c, key=lambda c: m[8], reverse=True)
-            #junto = zip(c, p)
-
-        #tag = int(reg/10)
-        #context['tag'] = self.request.GET.get('tag')
-        #context['data'] = data
-		context['prescription'] = p
-
+		
+		context['data'] = m['REG. PACIENTE']
+		context['registro'] = '1234'
+		context['evolucao'] = strr
 		return context
