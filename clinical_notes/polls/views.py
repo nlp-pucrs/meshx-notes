@@ -28,14 +28,17 @@ class PacientePageView(TemplateView):
 
 		m= prescription.loc[0] #valor que ha' aqui
 
-		#evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
+		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
 		#Passando pelo xml
 
-		evolucao = 	['Medicina do Vício', 'Medicina do Adolescente', 'Medicina', 'Acinetobacter', 'Febre']
+		evolucao = 	['Medicina do Vício', 'Medicina do Adolescente', 'Medicina', 'Acinetobacter', 'Febre', '']
 
 		with gzip.open('./pordesc2018-small.xml.gz') as pordesc2018:
 			tree = ET.parse(pordesc2018)
 
+
+
+		#Verifica a lista para ver se a palavra esta no dicionario
 		cont = 0
 		for palavra in evolucao:
 				elem = tree.find("./DescriptorRecord/*/*/*/*/[String='"+palavra.title()+"']/../../../../")
@@ -55,3 +58,4 @@ class PacientePageView(TemplateView):
 		context['registro'] = '1234'
 		context['evolucao'] = strr
 		return context
+
