@@ -25,6 +25,7 @@
         $("a").click(function(){
                $("#informacoes").html($(this).attr("data-scope"));
                $("#relacionados").html($(this).attr("data-terms"));
+               $("#nome").html($(this).attr("data-name"));
         });
     });
     </script>
@@ -58,14 +59,14 @@
 
         <div class="col-4" data-name="teste">
           
-          <div id="informacoes">test teste test teste</div>
+          <div id="nome"></div>
+          <div id="informacoes"></div>
           <br/>
-          <div id="relacionados">Estou aqui!</div>
+          <div id="relacionados"></div>
 
         </div>
 
       </div>
   </div>
-<div class="well">Basic Well</div>
   </body>
 </html>
