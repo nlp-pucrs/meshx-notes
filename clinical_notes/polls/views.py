@@ -35,7 +35,7 @@ class PacientePageView(TemplateView):
 		prescription = pd.read_csv('./excel_evol.csv.gz', compression='gzip', nrows=50000)
 		wordModel = KeyedVectors.load_word2vec_format('health_w2v_unigram_50.bin', binary=True)
 
-		m = prescription.loc[15] #valor que ha' aqui
+		m = prescription.loc[12] #valor que ha' aqui
 
 		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
 		#Passando pelo xml
@@ -51,6 +51,16 @@ class PacientePageView(TemplateView):
 		#Verifica a lista para ver se a palavra esta no dicionario
 		cont = 0
 		for palavra in evolucao:
+
+			## Cria lista de palavras similares
+			sem_assento = self.remove_accents(palavra)
+			palavra_similar = []
+			if palavra in wordModel.vocab:
+				palavra_similar = wordModel.most_similar_cosmul(sem_assento,topn=20)
+
+			evolucao[cont] = palavra
+
+			## Busca palavra no Mesh
 			for dui in dictMesh:
 				d = dictMesh[dui]
 				for t in d['terms']:
@@ -58,27 +68,25 @@ class PacientePageView(TemplateView):
 						teste = dictMesh[dui]['terms']
 						termos = '<br/>- '.join(teste)
 						evolucao[cont] = '<a href="#" data-name="<h3>'+d['name']+'</h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
-						cont +=1
-						valida = True
+						#cont +=1
+						#valida = True
 						break
-			if valida == False:
-				evolucao[cont] = palavra
-				cont +=1
-				sem_assento = self.remove_accents(palavra)
-				if palavra in wordModel.vocab:
-					palavra_similar = wordModel.most_similar_cosmul(sem_assento,topn=20)
-					for p in palavra_similar:
-						if sem_assento == p[0]:
-							for t in d['terms']:
-								if t.lower() == p[0].lower():
-									teste = dictMesh[dui]['terms']
-									termos = '<br/>- '.join(teste)
-									evolucao[cont] = '<a href="#" data-name="<h3>'+d['name']+'</h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
-									cont +=1
-									break
 
+					#if valida == False:
+					else:
 
-			valida = False
+						## Busca palavras similares
+						for p in palavra_similar:
+							if t.lower() == p[0].lower() and p[1] > 0.9:
+								teste = dictMesh[dui]['terms']
+								termos = '<br/>- '.join(teste)
+								evolucao[cont] = '<a href="#" data-name="<h3>'+d['name']+'</h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
+								#cont +=1
+								break
+
+			
+			cont +=1
+			#valida = False
 					
 			
 		strr = ' '.join(evolucao)
