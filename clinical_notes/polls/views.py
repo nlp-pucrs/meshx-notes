@@ -69,27 +69,25 @@ class PacientePageView(TemplateView):
 					if new_t.lower() == palavra.lower():
 						teste = dictMesh[dui]['terms']
 						termos = '<br/>- '.join(teste)
+						
+
+						"""if(d['qualifier'] == 'anatomy & histology'):
+							#criar CSS que sublinhe com uma cor determinada
+						elif(d['qualifier'] == 'pharmacology'):
+							#criar CSS que sublinhe com uma cor determinada
+							#Alguns, como Absenteísmo, estao pegando este, REVISAR!"""
+
+
+
+
 						d['name'] = d['name'].replace('[', ' [')
-						evolucao[cont] = '<a href="#" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
-						#cont +=1
-						#valida = True
+						evolucao[cont] = '<a href="#" data-id="<b>ID: </b>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
 						break
 
-					#if valida == False:
-					"""else:
-
-						## Busca palavras similares
-						for p in palavra_similar:
-							if t.lower() == p[0].lower() and p[1] > 0.9:
-								teste = dictMesh[dui]['terms']
-								termos = '<br/>- '.join(teste)
-								evolucao[cont] = '<a href="#" data-name="<h3>'+d['name']+'</h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
-								#cont +=1
-								break"""
+					
 
 			
 			cont +=1
-			#valida = False
 					
 			
 		strr = ' '.join(evolucao)
