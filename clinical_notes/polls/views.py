@@ -64,16 +64,19 @@ class PacientePageView(TemplateView):
 			for dui in dictMesh:
 				d = dictMesh[dui]
 				for t in d['terms']:
-					if t.lower() == palavra.lower():
+					new_t = t.replace('<i>', '')
+					new_t = new_t.replace('</i>', '')
+					if new_t.lower() == palavra.lower():
 						teste = dictMesh[dui]['terms']
 						termos = '<br/>- '.join(teste)
-						evolucao[cont] = '<a href="#" data-name="<h3>'+d['name']+'</h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
+						d['name'] = d['name'].replace('[', ' [')
+						evolucao[cont] = '<a href="#" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
 						#cont +=1
 						#valida = True
 						break
 
 					#if valida == False:
-					else:
+					"""else:
 
 						## Busca palavras similares
 						for p in palavra_similar:
@@ -82,7 +85,7 @@ class PacientePageView(TemplateView):
 								termos = '<br/>- '.join(teste)
 								evolucao[cont] = '<a href="#" data-name="<h3>'+d['name']+'</h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
 								#cont +=1
-								break
+								break"""
 
 			
 			cont +=1
