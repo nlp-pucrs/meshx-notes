@@ -1,6 +1,41 @@
 <!doctype html>
 <html lang="en">
   <head>
+
+    <style>
+      .sympton{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: pink;
+        transition: border 1s linear;
+      }
+
+      .procedure{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: black;
+        transition: border 1s linear;
+      }
+
+      .diagnosis{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: green;
+        transition: border 1s linear;
+      }
+
+      .medication{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: red;
+        transition: border 1s linear;
+      }
+
+      .anatomy{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: blue;
+        transition: border 1s linear;
+      }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="estilo.css"/>
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -42,11 +77,25 @@
     </div>
     <br>
 
+  <div class="container">
+    <div class="row">
+      
+      <div class="col-7">
+        Voltar
+      </div> 
+
+      <div class="col-1">
+        Avançar
+      </div> 
+      
+    </div>
+  </div>
+  <br>
+
 
   <div class="container">
       <div class="row">
         <div class="col-8">
-          
           {% block title %}
 
             Registro do paciente: {{ registro }}

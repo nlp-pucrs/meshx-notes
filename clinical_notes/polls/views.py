@@ -25,17 +25,17 @@ class PacientePageView(TemplateView):
 	def remove_accents(self, input_str):
 		nfkd_form = unicodedata.normalize('NFKD', input_str)
 		return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
-	
-
 
 	def get_context_data(self, **kwargs):
+
+		indice = 12
 
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
 		prescription = pd.read_csv('./excel_evol.csv.gz', compression='gzip', nrows=50000)
 		wordModel = KeyedVectors.load_word2vec_format('health_w2v_unigram_50.bin', binary=True)
 
-		m = prescription.loc[12] #valor que ha' aqui
+		m = prescription.loc[indice] #valor que ha' aqui
 
 		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
 		#Passando pelo xml
@@ -71,17 +71,26 @@ class PacientePageView(TemplateView):
 						termos = '<br/>- '.join(teste)
 						
 
-						"""if(d['qualifier'] == 'anatomy & histology'):
-							#criar CSS que sublinhe com uma cor determinada
+						if(d['qualifier'] == 'anatomy & histology'):
+							start_underline = '<span class = "anatomy">'
+							end_underline = '</span>'
 						elif(d['qualifier'] == 'pharmacology'):
-							#criar CSS que sublinhe com uma cor determinada
-							#Alguns, como Absenteísmo, estao pegando este, REVISAR!"""
-
+							start_underline = '<span class = "medication">'
+							end_underline = '</span>'
+						elif(d['qualifier'] == 'methods'):
+							start_underline = '<span class = "procedure">'
+							end_underline = "</span>"
+						elif(d['qualifier'] == 'diagnosis'):
+							start_underline = '<span class = "diagnosis">'
+							end_underline = '</span>'
+						else:
+							start_underline = ''
+							end_underline = ''
 
 
 
 						d['name'] = d['name'].replace('[', ' [')
-						evolucao[cont] = '<a href="#" data-id="<b>ID: </b>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<b>Termos semelhantes:</b><br/>- '+termos+'" data-scope="<b>Definicao:</b> '+d['scope']+'">'+palavra+'</a>'
+						evolucao[cont] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>Termos semelhantes:</strong><br/>- '+termos+'" data-scope="<strong>Definicao:</strong> '+d['scope']+'">'+palavra+'</a>'+end_underline
 						break
 
 					
