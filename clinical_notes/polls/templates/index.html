@@ -5,7 +5,7 @@
     <style>
       .sympton{
         border-bottom: 1px solid transparent;
-        border-bottom-color: pink;
+        border-bottom-color: black;
         transition: border 1s linear;
       }
 
@@ -32,6 +32,38 @@
         border-bottom-color: blue;
         transition: border 1s linear;
       }
+
+      .dot_procedure {
+        height: 10px;
+        width: 10px;
+        background-color: black;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot_diagnosis {
+        height: 10px;
+        width: 10px;
+        background-color: green;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot_medication {
+        height: 10px;
+        width: 10px;
+        background-color: red;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot_anatomy {
+        height: 10px;
+        width: 10px;
+        background-color: blue;
+        border-radius: 50%;
+        display: inline-block;
+      }
     </style>
 
     <link rel="stylesheet" type="text/css" href="estilo.css"/>
@@ -55,6 +87,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script>
+    var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
+    var url = new URL(url_string);
+    var c = url.searchParams.get("c");
+    console.log(c);
+
     var i =0;
     $(document).ready(function(){
         $("a").click(function(){
@@ -75,17 +112,28 @@
     <div class="container">
        <h1>Teste evoluçoes</h1>
     </div>
+    
+    <div class="container">
+          <span class="dot_procedure"></span> Procedure
+          <span class="dot_diagnosis"></span> Diagnosis
+          <span class="dot_medication"></span> Medication
+          <span class="dot_anatomy"></span> Anatomy
+        </div>
     <br>
 
   <div class="container">
     <div class="row">
       
       <div class="col-7">
-        Voltar
+        {% if indice_retornar != -1 %}  
+         <a href="?id={{ indice_retornar }}">Voltar</a> 
+        {% endif %}
       </div> 
 
       <div class="col-1">
-        Avançar
+        {% if indice_avancar != ultima_posicao %}  
+          <a href="?id={{ indice_avancar }}">Avançar</a> 
+        {% endif %}
       </div> 
       
     </div>
