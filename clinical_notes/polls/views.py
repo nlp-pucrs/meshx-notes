@@ -76,18 +76,34 @@ class PacientePageView(TemplateView):
 			fp.close()
 
 		#Verifica a lista para ver se a palavra esta no dicionario
-		cont = 0
-		for palavra in evolucao:
+		valida = 0
+		for i in range(len(evolucao)):
 
-			evolucao[cont] = palavra
+			#if valida > 1:
+			#	valida -= 1 	
+			#	continue
+
+			#if(cont >= (len(evolucao))):
+			#	break
+
+			palavra = evolucao[i]
 
 			## Busca palavra no Mesh
 			for dui in dictMesh:
 				d = dictMesh[dui]
 				for t in d['terms']:
 					new_t = t.replace('<i>', '')
-					new_t = new_t.replace('</i>', '')
-					if new_t.lower() == palavra.lower():
+					new_t = new_t.replace('</i>', '')	
+
+					valida = 0
+
+					if (i+1 < (len(evolucao)) and palavra.lower()+" "+evolucao[i+1].lower() == new_t.lower()):
+						valida = 2	
+						evolucao[i+1] = ''
+					elif new_t.lower() == palavra.lower():
+						valida = 1
+
+					if valida != 0:
 						teste = dictMesh[dui]['terms']
 						termos = '<br/>- '.join(teste)
 						
@@ -112,10 +128,14 @@ class PacientePageView(TemplateView):
 						#Sobrescreve a que tinha e bota com uma nova com o link etc.
 
 						d['name'] = d['name'].replace('[', ' [')
-						evolucao[cont] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+d['scope']+'">'+palavra+'</a>'+end_underline
+						evolucao[i] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+d['scope']+'">'+new_t+'</a>'+end_underline
+						
 						break
 
-			cont +=1
+				if valida != 0:
+					break
+
+			#cont +=1
 					
 		#Junta tudo novamente
 
