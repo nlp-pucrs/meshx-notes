@@ -114,11 +114,19 @@
     </div>
     
     <div class="container">
+      {% if lingua == "pt" %}
+          <span class="dot_procedure"></span> Processamentos
+          <span class="dot_diagnosis"></span> Diagnosticos
+          <span class="dot_medication"></span> Medicacoes
+          <span class="dot_anatomy"></span> Anatomia
+        
+      {% else %}
           <span class="dot_procedure"></span> Procedure
           <span class="dot_diagnosis"></span> Diagnosis
           <span class="dot_medication"></span> Medication
           <span class="dot_anatomy"></span> Anatomy
-        </div>
+      {% endif %}
+    </div>
     <br>
 
   <div class="container">
@@ -126,13 +134,13 @@
       
       <div class="col-7">
         {% if indice_retornar != -1 %}  
-         <a href="?id={{ indice_retornar }}">Voltar</a> 
+         <a href="?id={{ indice_retornar }}&l={{ lingua }}">Voltar</a> 
         {% endif %}
       </div> 
 
       <div class="col-1">
         {% if indice_avancar != ultima_posicao %}  
-          <a href="?id={{ indice_avancar }}">Avançar</a> 
+          <a href="?id={{ indice_avancar }}&l={{ lingua }}">Avançar</a> 
         {% endif %}
       </div> 
       
@@ -145,12 +153,19 @@
       <div class="row">
         <div class="col-8">
           {% block title %}
-
-            Registro do paciente: {{ registro }}
-            <br><br>
-            Data: {{ data }}
-            <br><br>
-            Evolucoes: {{ evolucao |safe}}
+            {% if lingua == "pt" %}
+                Registro do paciente: {{ registro }}
+                <br><br>
+                Data: {{ data }}
+                <br><br>
+                Evolucoes: {{ evolucao |safe}}
+            {% else %}
+                Patient identification: {{ registro }}
+                <br><br>
+                Date: {{ data }}
+                <br><br>
+                Evolution: {{ evolucao |safe}}
+            {% endif %}
           {% endblock %}
 
         </div>

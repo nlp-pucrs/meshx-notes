@@ -10,7 +10,7 @@ from django.conf.urls import url
 ###
 
 from . import views
-from polls.views import PacientePageView, PacientePageViewEng
+from polls.views import PacientePageView#, PacientePageViewEng
 
 urlpatterns = [
 	#path('', PacientePageView.as_view(), name='index'),

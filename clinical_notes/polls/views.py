@@ -26,28 +26,54 @@ class PacientePageView(TemplateView):
 		nfkd_form = unicodedata.normalize('NFKD', input_str)
 		return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
+
+
 	def get_context_data(self, **kwargs):
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
-		prescription = pd.read_csv('./excel_evol.csv.gz', compression='gzip', nrows=50000)
+		#Verifica se ha idioma
 
-		indice = int(self.request.GET.get('id'))
+		lingua = self.request.GET.get('l')
 
-		if  (0 > indice) or (indice >= ( len(prescription.loc[::]) ) ) or indice == None:
+		if lingua == None or (lingua != 'pt' and lingua != 'eng'):
+			lingua = 'pt'
+
+		if(lingua == 'pt'):
+			caminho_evolucao = './excel_evol.csv.gz'
+			caminho_dicionario = 'dictMesh.dict.gz'
+			definicao = 'Definicao'
+			termos_semelhantes = 'Termos semelhantes'
+		elif(lingua == 'eng'):
+			caminho_evolucao = './excel_evol_eng.csv.gz'
+			caminho_dicionario = 'dictMesh.dict_eng.gz'
+			definicao = 'Definition'
+			termos_semelhantes = 'Similar terms'
+
+
+		prescription = pd.read_csv(caminho_evolucao, compression='gzip', nrows=50000)
+
+
+		#Verifica se ha o ID
+
+		if self.request.GET.get('id') == None:
+			indice = 0
+		else:
+			indice = int(self.request.GET.get('id'))
+
+		if (0 > indice) or (indice >= ( len(prescription.loc[::]) ) ):
 			indice = 0
 
-		m = prescription.loc[indice] #valor que ha' aqui
+		#valor que ha' aqui
+
+		m = prescription.loc[indice] 
 
 		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
-		#Passando pelo xml
+
+		#Abrindo o dicionario
 		
-		with gzip.open('dictMesh.dict.gz','rb') as fp:
+		with gzip.open(caminho_dicionario,'rb') as fp:
 			dictMesh = pickle.load(fp)
 			fp.close()
-
-		
-
-		valida = False
 
 		#Verifica a lista para ver se a palavra esta no dicionario
 		cont = 0
@@ -65,6 +91,7 @@ class PacientePageView(TemplateView):
 						teste = dictMesh[dui]['terms']
 						termos = '<br/>- '.join(teste)
 						
+						#Verifica o qualifier, se ha, entao salva, senao bota vazio
 
 						if(d['qualifier'] == 'anatomy & histology'):
 							start_underline = '<span class = "anatomy">'
@@ -82,106 +109,25 @@ class PacientePageView(TemplateView):
 							start_underline = ''
 							end_underline = ''
 
-
-
-						d['name'] = d['name'].replace('[', ' [')
-						evolucao[cont] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>Termos semelhantes:</strong><br/>- '+termos+'" data-scope="<strong>Definicao:</strong> '+d['scope']+'">'+palavra+'</a>'+end_underline
-						break
-
-					
-
-			
-			cont +=1
-					
-			
-		strr = ' '.join(evolucao)
-		
-		context['data'] = m['DATA EVOL']
-		context['registro'] = m['REG. PACIENTE']
-		context['evolucao'] = strr
-		context['indice_avancar'] = int(indice+1)
-		context['indice_retornar'] = indice-1
-		context['ultima_posicao'] = len(m) - 1
-		return context
-
-###################################################
-
-
-class PacientePageViewEng(TemplateView):
-	template_name = 'index.html'
-	
-	def remove_accents(self, input_str):
-		nfkd_form = unicodedata.normalize('NFKD', input_str)
-		return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
-
-	def get_context_data(self, **kwargs):
-		context = super(PacientePageViewEng, self).get_context_data(**kwargs)
-
-		prescription = pd.read_csv('./excel_evol_eng.csv.gz', compression='gzip', nrows=50000)
-
-		indice = int(self.request.GET.get('id'))
-
-		if  (0 > indice) or (indice >= ( len(prescription.loc[::]) ) ) or indice == None:
-			indice = 0
-		m = prescription.loc[indice]
-
-		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
-		#Passando pelo xml
-		
-		with gzip.open('dictMesh.dict_eng.gz','rb') as fp:
-			dictMesh = pickle.load(fp)
-			fp.close()
-
-		valida = False
-
-		#Verifica a lista para ver se a palavra esta no dicionario
-		cont = 0
-		for palavra in evolucao:
-
-			evolucao[cont] = palavra
-
-			## Busca palavra no Mesh
-			for dui in dictMesh:
-				d = dictMesh[dui]
-				for t in d['terms']:
-					new_t = t.replace('<i>', '')
-					new_t = new_t.replace('</i>', '')
-					if new_t.lower() == palavra.lower():
-						teste = dictMesh[dui]['terms']
-						termos = '<br/>- '.join(teste)
-						
-
-						if(d['qualifier'] == 'anatomy & histology'):
-							start_underline = '<span class = "anatomy">'
-							end_underline = '</span>'
-						elif(d['qualifier'] == 'methods'):
-							start_underline = '<span class = "procedure">'
-							end_underline = "</span>"
-						elif(d['qualifier'] == 'diagnosis'):
-							start_underline = '<span class = "diagnosis">'
-							end_underline = '</span>'
-						elif(d['qualifier'] == 'pharmacology'):
-							start_underline = '<span class = "medication">'
-							end_underline = '</span>'
-						else:
-							start_underline = ''
-							end_underline = ''
+						#Sobrescreve a que tinha e bota com uma nova com o link etc.
 
 						d['name'] = d['name'].replace('[', ' [')
-						evolucao[cont] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>Termos semelhantes:</strong><br/>- '+termos+'" data-scope="<strong>Definicao:</strong> '+d['scope']+'">'+palavra+'</a>'+end_underline
+						evolucao[cont] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+d['scope']+'">'+palavra+'</a>'+end_underline
 						break
 
-					
-
-			
 			cont +=1
+					
+		#Junta tudo novamente
 
 		strr = ' '.join(evolucao)
+
+		#Retorna pro template
 		
 		context['data'] = m['DATA EVOL']
 		context['registro'] = m['REG. PACIENTE']
 		context['evolucao'] = strr
 		context['indice_avancar'] = indice+1
 		context['indice_retornar'] = indice-1
-		context['ultima_posicao'] = len(m) - 1
+		context['ultima_posicao'] = len(prescription.loc[::])
+		context['lingua'] = lingua
 		return context
