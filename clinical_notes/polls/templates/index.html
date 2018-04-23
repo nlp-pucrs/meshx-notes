@@ -1,186 +1,289 @@
-<!doctype html>
 <html lang="en">
+<style>
+  .procedure{
+    border-bottom: 1px solid transparent;
+    border-bottom-color: black;
+    transition: border 1s linear;
+  }
+
+  .diagnosis{
+    border-bottom: 1px solid transparent;
+    border-bottom-color: green;
+    transition: border 1s linear;
+  }
+
+  .medication{
+    border-bottom: 1px solid transparent;
+    border-bottom-color: red;
+    transition: border 1s linear;
+  }
+
+  .anatomy{
+    border-bottom: 1px solid transparent;
+    border-bottom-color: blue;
+    transition: border 1s linear;
+  }
+
+  .other{
+    border-bottom: 1px solid transparent;
+    border-bottom-color: #871F78;
+    transition: border 1s linear;
+  }
+
+  .footer {
+    /*position:absolute;*/
+    bottom:-200;
+    width:100%;
+    height:40px;      /* Height of the footer */
+    left: 0px;
+    background:#6cf;
+  }
+
+  .menu {
+    border-left: 1px solid transparent;
+    border-left-color: gray;
+    transition: border 1s linear;
+  }
+
+
+  .foo {
+    float: left;
+    width: 20px;
+    height: 19px;
+    margin: 0px;
+    border: 2px solid rgba(0, 0, 0, 0.336);
+  }
+
+  .black {
+    background: #000000;
+  }
+
+  .green {
+    background: #00661a;
+  }
+
+  .red {
+    background: #cc0404;
+  }
+
+  .blue {
+    background: #0400dbf6;
+  }
+
+  .purple {
+    background: #871F78;
+  }
+
+  .br {
+    line-height: 150%;
+  }
+</style>
   <head>
 
-    <style>
-      .sympton{
-        border-bottom: 1px solid transparent;
-        border-bottom-color: black;
-        transition: border 1s linear;
-      }
-
-      .procedure{
-        border-bottom: 1px solid transparent;
-        border-bottom-color: black;
-        transition: border 1s linear;
-      }
-
-      .diagnosis{
-        border-bottom: 1px solid transparent;
-        border-bottom-color: green;
-        transition: border 1s linear;
-      }
-
-      .medication{
-        border-bottom: 1px solid transparent;
-        border-bottom-color: red;
-        transition: border 1s linear;
-      }
-
-      .anatomy{
-        border-bottom: 1px solid transparent;
-        border-bottom-color: blue;
-        transition: border 1s linear;
-      }
-
-      .dot_procedure {
-        height: 10px;
-        width: 10px;
-        background-color: black;
-        border-radius: 50%;
-        display: inline-block;
-      }
-
-      .dot_diagnosis {
-        height: 10px;
-        width: 10px;
-        background-color: green;
-        border-radius: 50%;
-        display: inline-block;
-      }
-
-      .dot_medication {
-        height: 10px;
-        width: 10px;
-        background-color: red;
-        border-radius: 50%;
-        display: inline-block;
-      }
-
-      .dot_anatomy {
-        height: 10px;
-        width: 10px;
-        background-color: blue;
-        border-radius: 50%;
-        display: inline-block;
-      }
-    </style>
-
-    <link rel="stylesheet" type="text/css" href="estilo.css"/>
-
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <title>MeSHx-Notes</title>
 
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <title>Teste evoluçoes</title>
 
     <!--ajax start -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script>
-    var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
-    var url = new URL(url_string);
-    var c = url.searchParams.get("c");
-    console.log(c);
+      var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
+      var url = new URL(url_string);
+      var c = url.searchParams.get("c");
+      console.log(c);
 
-    var i =0;
-    $(document).ready(function(){
-        $("a").click(function(){
-               $("#informacoes").html($(this).attr("data-scope"));
-               $("#relacionados").html($(this).attr("data-terms"));
-               $("#nome").html($(this).attr("data-name"));
-               $("#id").html($(this).attr("data-id"));
-        });
-    });
+      var i =0;
+      $(document).ready(function(){
+          $("a").click(function(){
+                 $("#informacoes").html($(this).attr("data-scope"));
+                 $("#relacionados").html($(this).attr("data-terms"));
+                 $("#nome").html($(this).attr("data-name"));
+                 $("#id").html($(this).attr("data-id"));
+          });
+      });
     </script>
-
-
-  <!--ajax end -->
-
+ 
   </head>
+
   <body>
-    <br>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">MeSHx-Notes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              {% if lingua == "pt" %}
+                <a class="nav-link" href="?id={{ indice }}&l=en"> EN 
+              {% else %}
+                <a class="nav-link" href="?id={{ indice }}&l=pt"> PT 
+              {% endif %}
+            </a>
+            </li>
+            <li class="nav-item menu">  </li>
+
+            <li class="nav-item">
+              {% if indice_retornar != -1 %}
+              <a class="nav-link" href="?id={{ indice_retornar }}&l={{ lingua }}">
+              {% if lingua == "pt" %} Anterior 
+              {% else %} Back {% endif %}
+            </a>
+              {% endif %}
+            </li>
+            <li class="nav-item">
+              {% if indice_avancar != ultima_posicao %}  
+              <a class="nav-link" href="?id={{ indice_avancar }}&l={{ lingua }}">
+              {% if lingua == "pt" %} Próximo 
+              {% else %} Next {% endif %}
+            </a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
     <div class="container">
-       <h1>Teste evoluçoes</h1>
-    </div>
-    
-    <div class="container">
-      {% if lingua == "pt" %}
-          <span class="dot_procedure"></span> Processamentos
-          <span class="dot_diagnosis"></span> Diagnosticos
-          <span class="dot_medication"></span> Medicacoes
-          <span class="dot_anatomy"></span> Anatomia
-        
-      {% else %}
-          <span class="dot_procedure"></span> Procedure
-          <span class="dot_diagnosis"></span> Diagnosis
-          <span class="dot_medication"></span> Medication
-          <span class="dot_anatomy"></span> Anatomy
-      {% endif %}
-    </div>
-    <br>
 
-  <div class="container">
-    <div class="row">
-      
-      <div class="col-7">
-        {% if indice_retornar != -1 %}  
-         <a href="?id={{ indice_retornar }}&l={{ lingua }}">Voltar</a> 
-        {% endif %}
-      </div> 
-
-      <div class="col-1">
-        {% if indice_avancar != ultima_posicao %}  
-          <a href="?id={{ indice_avancar }}&l={{ lingua }}">Avançar</a> 
-        {% endif %}
-      </div> 
-      
-    </div>
-  </div>
-  <br>
-
-
-  <div class="container">
       <div class="row">
-        <div class="col-8">
-          {% block title %}
-            {% if lingua == "pt" %}
-                Registro do paciente: {{ registro }}
-                <br><br>
-                Data: {{ data }}
-                <br><br>
-                Evolucoes: {{ evolucao |safe}}
-            {% else %}
-                Patient identification: {{ registro }}
-                <br><br>
-                Date: {{ data }}
-                <br><br>
-                Evolution: {{ evolucao |safe}}
-            {% endif %}
-          {% endblock %}
 
+        <!-- Post Content Column -->
+        <div class="col-lg-8">
+
+          <!-- Author -->
+          <p class="lead">
+            by
+            <a href="#">João Etchichury Soares e Rafael Oleques Nunes</a>
+          </p>
+
+          <hr>
+
+          <!-- Date/Time Created on April 18, 2018 -->
+          <p>Criado em 18 de abril de 2018</p>
+
+          <hr>
+          
+          <div class="card my-4">
+            <h5 class="card-header">
+                {% if lingua == "pt" %} Evolução 
+                {% else %} Evolution {% endif %}
+            </h5>
+            <div class="card-body">
+                {% block title %}
+                  {% if lingua == "pt" %}
+                      Registro do paciente: {{ registro }}
+                      <br><br>
+                      Data: {{ data }}
+                      <br><br>
+                      Evolucoes: {{ evolucao |safe}}
+                  {% else %}
+                      Patient identification: {{ registro }}
+                      <br><br>
+                      Date: {{ data }}
+                      <br><br>
+                      Evolution: {{ evolucao |safe}}
+                  {% endif %}
+                {% endblock %}
+            </div>
+          </div>
         </div>
 
-        <div class="col-4" data-name="teste">
-          
-          <div id="nome"></div>
-          <div id="id"></div>
-          <div id="informacoes"></div>
-          <br/>
-          <div id="relacionados"></div>
+        <!-- Sidebar Widgets Column -->
+        <div class="col-md-4">
+            <br><br><br><br>  
+          <!-- Categories Widget -->
+          <div class="card my-4">
+            <h5 class="card-header">
+              {% if lingua == "pt" %} Categorias
+              {% else %} Categories {% endif %}
+            </h5>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-12">
+                  <ul class="list-unstyled mb-0">
+                    <li>
+                        <a>
+                          <div class="foo black"></div> &nbsp;
+                          {% if lingua == "pt" %} Procedimento 
+                          {% else %} Procedure {% endif %}
 
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                          <div class="foo green"></div> &nbsp; 
+                          {% if lingua == "pt" %} Diagnóstico 
+                          {% else %} Diagnosis {% endif %}
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <div class="foo red "></div> &nbsp;
+                            {% if lingua == "pt" %} Medicação 
+                            {% else %} Medication {% endif %}
+                        </a>
+                    </li>
+                    <li>
+                        <a>
+                            <div class="foo blue"> </div> &nbsp;
+                            {% if lingua == "pt" %} Anatomia 
+                            {% else %} Anatomy {% endif %}
+                        </a>
+                    </li> 
+                    <li>
+                        <a>
+                            <div class="foo purple"> </div> &nbsp;
+                            {% if lingua == "pt" %} Outros 
+                            {% else %} Other {% endif %}
+                        </a>
+                    </li>   
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card my-4">
+              <h5 class="card-header">
+                {% if lingua == "pt" %} Definição 
+                {% else %} Definition {% endif %}
+              </h5>
+              <div class="card-body">
+                <div id="nome"></div>
+                <div id="id"></div>
+                <div id="informacoes"></div>
+                <br/>
+                <div id="relacionados"></div>
+              </div>
+          <div/>
         </div>
 
       </div>
-  </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer class="py-2 bg-dark footer">
+      <div class="container">
+        <p class="m-0 text-center text-white">MeSHx-Notes | Equipe de PLN - PUCRS</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
   </body>
-</html>
+</html> 

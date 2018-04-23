@@ -35,7 +35,7 @@ class PacientePageView(TemplateView):
 
 		lingua = self.request.GET.get('l')
 
-		if lingua == None or (lingua != 'pt' and lingua != 'eng'):
+		if lingua == None or (lingua != 'pt' and lingua != 'en'):
 			lingua = 'pt'
 
 		if(lingua == 'pt'):
@@ -43,7 +43,7 @@ class PacientePageView(TemplateView):
 			caminho_dicionario = 'dictMesh.dict.gz'
 			definicao = 'Definicao'
 			termos_semelhantes = 'Termos semelhantes'
-		elif(lingua == 'eng'):
+		elif(lingua == 'en'):
 			caminho_evolucao = './excel_evol_eng.csv.gz'
 			caminho_dicionario = 'dictMesh.dict_eng.gz'
 			definicao = 'Definition'
@@ -79,28 +79,27 @@ class PacientePageView(TemplateView):
 		valida = 0
 		for i in range(len(evolucao)):
 
-			#if valida > 1:
-			#	valida -= 1 	
-			#	continue
-
-			#if(cont >= (len(evolucao))):
-			#	break
-
 			palavra = evolucao[i]
 
 			## Busca palavra no Mesh
 			for dui in dictMesh:
 				d = dictMesh[dui]
 				for t in d['terms']:
+					#Retira as tags de italico na hora de comparar com as palavras da evolucao
 					new_t = t.replace('<i>', '')
 					new_t = new_t.replace('</i>', '')	
 
 					valida = 0
 
-					if (i+1 < (len(evolucao)) and palavra.lower()+" "+evolucao[i+1].lower() == new_t.lower()):
-						valida = 2	
+					#Verifica se e um bigram, se for, vai apagar o proximo para nao aparecer repetido
+					if (i+2 < (len(evolucao)) and palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower() == new_t.lower()):
+						valida = 3	
 						evolucao[i+1] = ''
-					elif new_t.lower() == palavra.lower():
+						evolucao[i+2] = ''
+					elif (i+1 < (len(evolucao)) and palavra.lower()+" "+evolucao[i+1].lower() == new_t.lower()):
+						valida = 2	
+						evolucao[i+1] = '' 
+					elif new_t.lower() == palavra.lower():#Verifica se e um unigram
 						valida = 1
 
 					if valida != 0:
@@ -121,6 +120,9 @@ class PacientePageView(TemplateView):
 						elif(d['qualifier'] == 'pharmacology'):
 							start_underline = '<span class = "medication">'
 							end_underline = '</span>'
+						elif(d['qualifier'] == '#'):
+							start_underline = '<span class = "other">'
+							end_underline = '</span>'
 						else:
 							start_underline = ''
 							end_underline = ''
@@ -131,12 +133,10 @@ class PacientePageView(TemplateView):
 						evolucao[i] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+d['ID']+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+dui+'\'>'+d['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+d['scope']+'">'+new_t+'</a>'+end_underline
 						
 						break
-
+				#Se ele ja achou a palavra, entao sai do loop e vai para a proxima
 				if valida != 0:
 					break
 
-			#cont +=1
-					
 		#Junta tudo novamente
 
 		strr = ' '.join(evolucao)
@@ -147,6 +147,7 @@ class PacientePageView(TemplateView):
 		context['registro'] = m['REG. PACIENTE']
 		context['evolucao'] = strr
 		context['indice_avancar'] = indice+1
+		context['indice'] = indice
 		context['indice_retornar'] = indice-1
 		context['ultima_posicao'] = len(prescription.loc[::])
 		context['lingua'] = lingua

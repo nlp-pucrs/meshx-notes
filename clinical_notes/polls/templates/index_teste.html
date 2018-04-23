@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+
+    <style>
+      .sympton{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: black;
+        transition: border 1s linear;
+      }
+
+      .procedure{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: black;
+        transition: border 1s linear;
+      }
+
+      .diagnosis{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: green;
+        transition: border 1s linear;
+      }
+
+      .medication{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: red;
+        transition: border 1s linear;
+      }
+
+      .anatomy{
+        border-bottom: 1px solid transparent;
+        border-bottom-color: blue;
+        transition: border 1s linear;
+      }
+
+      .dot_procedure {
+        height: 10px;
+        width: 10px;
+        background-color: black;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot_diagnosis {
+        height: 10px;
+        width: 10px;
+        background-color: green;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot_medication {
+        height: 10px;
+        width: 10px;
+        background-color: red;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot_anatomy {
+        height: 10px;
+        width: 10px;
+        background-color: blue;
+        border-radius: 50%;
+        display: inline-block;
+      }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="estilo.css"/>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Teste evoluçoes</title>
+
+    <!--ajax start -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+    var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
+    var url = new URL(url_string);
+    var c = url.searchParams.get("c");
+    console.log(c);
+
+    var i =0;
+    $(document).ready(function(){
+        $("a").click(function(){
+               $("#informacoes").html($(this).attr("data-scope"));
+               $("#relacionados").html($(this).attr("data-terms"));
+               $("#nome").html($(this).attr("data-name"));
+               $("#id").html($(this).attr("data-id"));
+        });
+    });
+    </script>
+
+
+  <!--ajax end -->
+
+  </head>
+  <body>
+    <br>
+    <div class="container">
+       <h1>Teste evoluçoes</h1>
+    </div>
+    
+    <div class="container">
+      {% if lingua == "pt" %}
+          <span class="dot_procedure"></span> Processamentos
+          <span class="dot_diagnosis"></span> Diagnosticos
+          <span class="dot_medication"></span> Medicacoes
+          <span class="dot_anatomy"></span> Anatomia
+        
+      {% else %}
+          <span class="dot_procedure"></span> Procedure
+          <span class="dot_diagnosis"></span> Diagnosis
+          <span class="dot_medication"></span> Medication
+          <span class="dot_anatomy"></span> Anatomy
+      {% endif %}
+    </div>
+    <br>
+
+  <div class="container">
+    <div class="row">
+      
+      <div class="col-7">
+        {% if indice_retornar != -1 %}  
+         <a href="?id={{ indice_retornar }}&l={{ lingua }}">Voltar</a> 
+        {% endif %}
+      </div> 
+
+      <div class="col-1">
+        {% if indice_avancar != ultima_posicao %}  
+          <a href="?id={{ indice_avancar }}&l={{ lingua }}">Avançar</a> 
+        {% endif %}
+      </div> 
+      
+    </div>
+  </div>
+  <br>
+
+
+  <div class="container">
+      <div class="row">
+        <div class="col-8">
+          {% block title %}
+            {% if lingua == "pt" %}
+                Registro do paciente: {{ registro }}
+                <br><br>
+                Data: {{ data }}
+                <br><br>
+                Evolucoes: {{ evolucao |safe}}
+            {% else %}
+                Patient identification: {{ registro }}
+                <br><br>
+                Date: {{ data }}
+                <br><br>
+                Evolution: {{ evolucao |safe}}
+            {% endif %}
+          {% endblock %}
+
+        </div>
+
+        <div class="col-4" data-name="teste">
+          
+          <div id="nome"></div>
+          <div id="id"></div>
+          <div id="informacoes"></div>
+          <br/>
+          <div id="relacionados"></div>
+
+        </div>
+
+      </div>
+  </div>
+  </body>
+</html>
