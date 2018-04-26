@@ -92,73 +92,91 @@ class PacientePageView(TemplateView):
 		for i in range(len(evolucao)):
 
 			palavra = evolucao[i].lower()
-			palavra_tri = palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower()
-			palavra_bi = palavra.lower()+" "+evolucao[i+1].lower()
-			palavra_i = '<i>' + palavra + '</i>'
-			ID = ''
+			palavra_i = '<i>' + palavra +'</i>'
+
+			if (i+2 < (len(evolucao))):
+				palavra_tri = palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower()
+				palavra_tri_i = '<i>' + palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower() + '</i>'
+
+			if (i+1 < (len(evolucao))):
+				palavra_bi = palavra.lower()+" "+evolucao[i+1].lower()
+				palavra_bi_i = '<i>' + palavra.lower()+" "+evolucao[i+1].lower() + '</i>'
+
+			indice_termos = ''
+			valida = 0
 
 			### pesquisa trigramas
 			if palavra_tri in indiceReverso:
-				ID = indiceReverso[palavra_tri]
-			### pesquisa bigrama
-			
+				indice_termos = palavra_tri
+				valida = 1	
+				evolucao[i+1] = ''
+				evolucao[i+2] = ''
 
+			elif palavra_tri_i in indiceReverso:
+				indice_termos = palavra_tri_i
+				valida = 2
+				evolucao[i+1] = ''
+				evolucao[i+2] = ''
+			### pesquisa bigrama
+			elif palavra_bi in indiceReverso:
+				indice_termos = palavra_bi
+				valida = 1
+				evolucao[i+1] = ''
+
+			elif palavra_bi_i in indiceReverso:
+				indice_termos = palavra_bi_i
+				valida = 2
+				evolucao[i+1] = ''
 			### pesquisa unigrama
 			elif palavra in indiceReverso:
-				ID = indiceReverso[palavra]
+				valida = 1
+				indice_termos = palavra
+
 			elif palavra_i in indiceReverso:
-				ID = indiceReverso[palavra_i]
+				indice_termos = palavra_i
+				valida = 2
 
-			if ID != '':
-			#for indice_termos in  indiceReverso:
-
-				new_t = indice_termos.replace('<i>', '')
-				new_t = new_t.replace('</i>', '')
-
-				valida = 0
-
-				#Verifica se e um bigram, se for, vai apagar o proximo para nao aparecer repetido
-				if (i+2 < (len(evolucao)) and palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower() == new_t.lower()):
-					valida = 3	
-					evolucao[i+1] = ''
-					evolucao[i+2] = ''
-				elif (i+1 < (len(evolucao)) and palavra.lower()+" "+evolucao[i+1].lower() == new_t.lower()):
-					valida = 2	
-					evolucao[i+1] = '' 
-				elif new_t.lower() == palavra.lower():#Verifica se e um unigram
-					valida = 1
-
-				if valida != 0:
-					ID = indiceReverso[indice_termos]['ID']	
-					teste = dictMesh[ID]['terms']
-					termos = '<br/>- '.join(teste)
+			if indice_termos != '':
+				if(valida == 2):
+					new_t = indice_termos.replace('</i>', '')
+					new_t = indice_termos.replace('<i>', '')
 					
-					#Verifica o qualifier, se ha, entao salva, senao bota vazio
+				else:
+					new_t = indice_termos
+					new_t = indice_termos
 
-					if(dictMesh[ID]['qualifier'] == 'anatomy & histology'):
-						start_underline = '<span class = "anatomy">'
-						end_underline = '</span>'
-					elif(dictMesh[ID]['qualifier'] == 'methods'):
-						start_underline = '<span class = "procedure">'
-						end_underline = "</span>"
-					elif(dictMesh[ID]['qualifier'] == 'diagnosis'):
-						start_underline = '<span class = "diagnosis">'
-						end_underline = '</span>'
-					elif(dictMesh[ID]['qualifier'] == 'pharmacology'):
-						start_underline = '<span class = "medication">'
-						end_underline = '</span>'
-					elif(dictMesh[ID]['qualifier'] == '#'):
-						start_underline = '<span class = "other">'
-						end_underline = '</span>'
-					else:
-						start_underline = ''
-						end_underline = ''
 
-					#Sobrescreve a que tinha e bota com uma nova com o link etc.
+				#if valida != 0:
+				ID = indiceReverso[indice_termos]['ID']	
+				teste = dictMesh[ID]['terms']
+				termos = '<br/>- '.join(teste)
+				
+				#Verifica o qualifier, se ha, entao salva, senao bota vazio
 
-					nome = dictMesh[ID]['name'].replace('[', ' [')
-					evolucao[i] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</a>'+end_underline
-					
+				if(dictMesh[ID]['qualifier'] == 'anatomy & histology'):
+					start_underline = '<span class = "anatomy">'
+					end_underline = '</span>'
+				elif(dictMesh[ID]['qualifier'] == 'methods'):
+					start_underline = '<span class = "procedure">'
+					end_underline = "</span>"
+				elif(dictMesh[ID]['qualifier'] == 'diagnosis'):
+					start_underline = '<span class = "diagnosis">'
+					end_underline = '</span>'
+				elif(dictMesh[ID]['qualifier'] == 'pharmacology'):
+					start_underline = '<span class = "medication">'
+					end_underline = '</span>'
+				elif(dictMesh[ID]['qualifier'] == '#'):
+					start_underline = '<span class = "other">'
+					end_underline = '</span>'
+				else:
+					start_underline = ''
+					end_underline = ''
+
+				#Sobrescreve a que tinha e bota com uma nova com o link etc.
+
+				nome = dictMesh[ID]['name'].replace('[', ' [')
+				evolucao[i] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</a>'+end_underline
+				
 		#Junta tudo novamente
 
 		strr = ' '.join(evolucao)
