@@ -42,15 +42,15 @@ class PacientePageView(TemplateView):
 			lingua = 'pt'
 
 		if(lingua == 'pt'):
-			caminho_evolucao = '../excel_evol.csv.gz'
-			caminho_dicionario = '../dictMesh.dict.gz'
-			caminho_indice = '../indiceReversoPT.dict.gz'
+			caminho_evolucao = '../data/excel_evol.csv.gz'
+			caminho_dicionario = '../data/dictMesh.dict.gz'
+			caminho_indice = '../data/indiceReversoPT.dict.gz'
 			definicao = 'Definicao'
 			termos_semelhantes = 'Termos semelhantes'
 		elif(lingua == 'en'):
-			caminho_evolucao = '../excel_evol_eng.csv.gz'
-			caminho_dicionario = '../dictMesh.dict_eng.gz'
-			caminho_indice = '../indiceReversoEN.dict.gz'
+			caminho_evolucao = '../data/excel_evol_eng.csv.gz'
+			caminho_dicionario = '../data/dictMesh.dict_eng.gz'
+			caminho_indice = '../data/indiceReversoEN.dict.gz'
 			definicao = 'Definition'
 			termos_semelhantes = 'Similar terms'
 
