@@ -249,10 +249,15 @@
               </h5>
               <div class="card-body">
                 <div id="nome"></div>
+
                 <div id="id"></div>
                 <div id="informacoes"></div>
                 <br/>
-                <div id="relacionados"></div>
+                <form name="valida" action="../valida" method="GET">
+                    <input type="hidden" name="id" value="{{ indice }}"/> 
+                    <input type="hidden" name="l" value="{{ lingua }}"/> 
+                    <div id="relacionados"></div>
+                </form>
               </div>
           <div/>
         </div>

@@ -21,6 +21,8 @@ import unicodedata
 
 from django.views.generic import TemplateView
 
+#from .forms import valida
+
 
 class PacientePageView(TemplateView):
 	template_name = 'index.html'
@@ -28,6 +30,24 @@ class PacientePageView(TemplateView):
 	def remove_accents(self, input_str):
 		nfkd_form = unicodedata.normalize('NFKD', input_str)
 		return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+	"""def valida(self, request):
+					if request.method == 'POST':
+			        # create a form instance and populate it with data from the request:
+						form = NameForm(request.POST)
+						# check whether it's valid:
+						if form.is_valid():
+							# process the data in form.cleaned_data as required
+							# ...
+							 # redirect to a new URL:
+				            return HttpResponseRedirect('/#/')
+			
+					# if a GET (or any other method) we'll create a blank form
+					else:
+						form = NameForm()
+			
+				    return render(request, 'index.html', {'form': form}"""
+
 
 
 
@@ -46,12 +66,14 @@ class PacientePageView(TemplateView):
 			caminho_dicionario = '../data/dictMesh.dict.gz'
 			caminho_indice = '../data/indiceReversoPT.dict.gz'
 			definicao = 'Definicao'
+			enviar = "Enviar"
 			termos_semelhantes = 'Termos semelhantes'
 		elif(lingua == 'en'):
 			caminho_evolucao = '../data/excel_evol_eng.csv.gz'
 			caminho_dicionario = '../data/dictMesh.dict_eng.gz'
 			caminho_indice = '../data/indiceReversoEN.dict.gz'
 			definicao = 'Definition'
+			enviar = "Send"
 			termos_semelhantes = 'Similar terms'
 
 
@@ -148,10 +170,12 @@ class PacientePageView(TemplateView):
 					new_t = indice_termos
 
 
-				#if valida != 0:
 				ID = indiceReverso[indice_termos]['ID']	
-				teste = dictMesh[ID]['terms']
-				termos = '<br/>- '.join(teste)
+				term = dictMesh[ID]['terms']
+				termos = '<br/>- '.join(term)
+
+				if "</i>" in indice_termos:
+					termos = termos+"<br/><br/><input type='submit' value='"+enviar+"'/>"
 				
 				#Verifica o qualifier, se ha, entao salva, senao bota vazio
 
