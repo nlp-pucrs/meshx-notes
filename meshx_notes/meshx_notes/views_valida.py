@@ -21,9 +21,13 @@ import unicodedata
 
 from django.views.generic import TemplateView
 
+import gzip, pickle
+
 class ValidaPageView(TemplateView):
 	template_name = 'valida.html'
+
 	def valida(self, **kwargs):
+		context = super(ValidaPageView, self).valida(**kwargs)
 		caminho_dicionario = '../data/dictMesh.dict.gz'
 
 		with gzip.open(caminho_dicionario,'rb') as fd:
@@ -49,16 +53,19 @@ class ValidaPageView(TemplateView):
 					}
 
 			#Salva o dicionario
-				import gzip, pickle
-
-				with gzip.open('./dictValida.dict.gz','wb') as fp:
+				with gzip.open('dictValida.dict.gz','wb') as fp:
 					pickle.dump(dictValida,fp)
 					fp.close()
+			#Somente de teste
 			else:
 				dictValida['eu'] = {
-					'ID': 21,
-					'target': 45
+					'ID': '21',
+					'target': '45'
 				}
-				with gzip.open('./dictValida.dict.gz','wb') as fp:
+				with gzip.open('dictValida.dict.gz','wb') as fp:
 					pickle.dump(dictValida,fp)
 					fp.close()
+
+		#Outro para teste
+		context['eu'] = "estou aqui funcionando!"
+		return context

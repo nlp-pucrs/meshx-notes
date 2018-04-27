@@ -31,26 +31,6 @@ class PacientePageView(TemplateView):
 		nfkd_form = unicodedata.normalize('NFKD', input_str)
 		return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
-	"""def valida(self, request):
-					if request.method == 'POST':
-			        # create a form instance and populate it with data from the request:
-						form = NameForm(request.POST)
-						# check whether it's valid:
-						if form.is_valid():
-							# process the data in form.cleaned_data as required
-							# ...
-							 # redirect to a new URL:
-				            return HttpResponseRedirect('/#/')
-			
-					# if a GET (or any other method) we'll create a blank form
-					else:
-						form = NameForm()
-			
-				    return render(request, 'index.html', {'form': form}"""
-
-
-
-
 	def get_context_data(self, **kwargs):
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
