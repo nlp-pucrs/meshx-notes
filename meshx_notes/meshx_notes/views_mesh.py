@@ -152,7 +152,11 @@ class PacientePageView(TemplateView):
 
 				ID = indiceReverso[indice_termos]['ID']	
 				term = dictMesh[ID]['terms']
-				termos = '<br/>- '.join(term)
+
+				if valida == 2:
+					termos = '<br/>- '.join(term)
+				else:
+					termos = '<br/>- '.join(term)
 
 				if "</i>" in indice_termos:
 					termos = termos+"<br/><br/><input type='submit' value='"+enviar+"'/>"

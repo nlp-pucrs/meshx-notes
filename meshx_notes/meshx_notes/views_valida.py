@@ -26,46 +26,73 @@ import gzip, pickle
 class ValidaPageView(TemplateView):
 	template_name = 'valida.html'
 
-	def valida(self, **kwargs):
-		context = super(ValidaPageView, self).valida(**kwargs)
+	def get_context_data(self, **kwargs):
+		context = super(ValidaPageView, self).get_context_data(**kwargs)
+		current_path = os.path.dirname(os.path.realpath(__file__))
 		caminho_dicionario = '../data/dictMesh.dict.gz'
+		caminho_indice = '../data/indiceReversoPT.dict.gz'
+		caminho_valida = '../data/dictValida.dict.gz'
+		caminho_dicionario = os.path.join(current_path, caminho_dicionario)
+		caminho_indice = os.path.join(current_path, caminho_indice)
+		caminho_valida = os.path.join(current_path, caminho_valida)
+
+		with gzip.open(caminho_indice,'rb') as fd:
+			indiceReverso = pickle.load(fd)
+			fd.close()
 
 		with gzip.open(caminho_dicionario,'rb') as fd:
 			dictMesh = pickle.load(fd)
 			fd.close()
 
+		with gzip.open(caminho_valida,'rb') as fd:
+			dictValida = pickle.load(fd)
+			fd.close()
+
 		ID = self.request.GET.get('ID')
+		dictValidaa = {}
+
+		context['eu'] = "estou aqui funcionando!"
 
 		if ID != None:
 			if ID in dictMesh:
-				for t in dictMesh[ID]:
-					#Poe a escolha do usuario aqui
-					val_valida = self.request.GET.get(t[terms])
+				#for t in dictMesh[ID]:
+				#Poe a escolha do usuario aqui
 
-					#Caso ele nao tenha escolhido, entao sera nula
-					if val_valida != 0 or val_valida != 1:
-						val_valida = None
+				val_valida = 2
 
-					#Poe no dicionario
-					dictValida[t[terms]] = {
-						'ID': ID,
-						'target': val_valida
-					}
+				termos = ' '.join(dictMesh[ID]['terms'])
+				for indice in indiceReverso:
+					if '<i>' in indice:
+						indice_list = indice.split(' ');
+						new_indice = indice_list[0]
+
+						if new_indice in ' '.join(dictMesh[ID]['terms']):
+							new_indice = new_indice.replace('</i>', '')
+							new_indice = new_indice.replace('<i>', '')
+							val_valida = self.request.GET.get(new_indice)
+							context['eu'] = "estou aqui!"
+							
+							#Poe no dicionario
+							if  val_valida != None:
+								dictValidaa[new_indice] = {
+									'ID': ID,
+									'target': val_valida
+								}
+							elif val_valida == None:
+								try:
+									dictValidaa[new_indice] = {
+										'ID': dictValida[new_indice]['ID'],
+										'target': dictValida[new_indice]['target']
+									}
+								except KeyError:
+									pass
+								
 
 			#Salva o dicionario
-				with gzip.open('dictValida.dict.gz','wb') as fp:
-					pickle.dump(dictValida,fp)
-					fp.close()
-			#Somente de teste
-			else:
-				dictValida['eu'] = {
-					'ID': '21',
-					'target': '45'
-				}
-				with gzip.open('dictValida.dict.gz','wb') as fp:
-					pickle.dump(dictValida,fp)
+				with gzip.open(caminho_valida,'wb') as fp:
+					pickle.dump(dictValidaa,fp)
 					fp.close()
 
 		#Outro para teste
-		context['eu'] = "estou aqui funcionando!"
+		
 		return context
