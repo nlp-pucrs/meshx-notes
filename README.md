@@ -1,5 +1,5 @@
-# clinical-notes-web
-Web System for Clinical Notes Annotation
+# MeSHx-Notes
+Web System for Clinical Notes Information Extraction
 
 Como instanciar o projeto:
 
