@@ -154,12 +154,12 @@ class PacientePageView(TemplateView):
 				term = dictMesh[ID]['terms']
 
 				if valida == 2:
-					termos = '<br/>- '.join(term)
+					termos = '<br/>- '.join(term[0:len(term)-1])
 				else:
-					termos = '<br/>- '.join(term)
+					termos = '<br/>- '.join(term[0:len(term)-1])
 
 				if "</i>" in indice_termos:
-					termos = termos+"<br/><br/><input type='submit' value='"+enviar+"'/>"
+					termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
 				
 				#Verifica o qualifier, se ha, entao salva, senao bota vazio
 

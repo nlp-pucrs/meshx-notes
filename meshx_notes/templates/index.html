@@ -103,6 +103,21 @@
           });
       });
     </script>
+
+    <script>
+      function cbx3(){
+          var arr = []/* Cria array com todos os names dos check selecionados */;
+          var val = []/* Cria array com todos os values dos check selecionados */;
+          var inputElements = document.getElementsByClassName('radio') /* Busca todos os elementos com o class radio */;
+          for(var i=0; inputElements[i]; ++i){
+              if(inputElements[i].checked){ /* Verifique se o elemento em questão está com o atributo checked marcado */
+                arr.push(inputElements[i].name+" "+inputElements[i].value) /* Inclui name do elemento em um array*/;
+              }
+          }
+          alert(arr)
+          return arr/* Retorna esse array */;
+      }
+    </script>
  
   </head>
 
@@ -253,11 +268,11 @@
                 <div id="id"></div>
                 <div id="informacoes"></div>
                 <br/>
-                <form name="valida" action="../valida" method="GET">
+                <!--<form name="valida" action="../valida" method="GET">-->
                     <input type="hidden" name="id" value="{{ indice }}"/> 
                     <input type="hidden" name="l" value="{{ lingua }}"/> 
                     <div id="relacionados"></div>
-                </form>
+               <!-- </form>-->
               </div>
           <div/>
         </div>
