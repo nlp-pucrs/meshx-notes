@@ -18,11 +18,9 @@ from django.urls import include, path
 from django.contrib import admin
 from .views_mesh import PacientePageView
 from .views_ea import EventoAdversoPageView
-from .views_valida import ValidaPageView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     path('meshx/', PacientePageView.as_view(), name='index'),
-    path('ea/', EventoAdversoPageView.as_view(), name='home'),
-    path('valida/', ValidaPageView.as_view(), name='valida')
+    path('ea/', EventoAdversoPageView.as_view(), name='home')
 ]

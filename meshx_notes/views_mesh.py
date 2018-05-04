@@ -21,6 +21,8 @@ import unicodedata
 
 from django.views.generic import TemplateView
 
+from .views_valida import ValidaClass
+
 #from .forms import valida
 
 
@@ -34,6 +36,12 @@ class PacientePageView(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
+		#Verifica se ha formulario para salvar
+		formulario = self.request.GET.get('serial')
+
+		if formulario != None:
+			ValidaClass.salva_formulario(formulario)
+
 		#Verifica se ha idioma
 
 		lingua = self.request.GET.get('l')
@@ -42,16 +50,16 @@ class PacientePageView(TemplateView):
 			lingua = 'pt'
 
 		if(lingua == 'pt'):
-			caminho_evolucao = '../data/excel_evol.csv.gz'
-			caminho_dicionario = '../data/dictMesh.dict.gz'
-			caminho_indice = '../data/indiceReversoPT.dict.gz'
+			caminho_evolucao = './data/excel_evol.csv.gz'
+			caminho_dicionario = './data/dictMesh.dict.gz'
+			caminho_indice = './data/indiceReversoPT.dict.gz'
 			definicao = 'Definicao'
 			enviar = "Enviar"
 			termos_semelhantes = 'Termos semelhantes'
 		elif(lingua == 'en'):
-			caminho_evolucao = '../data/excel_evol_eng.csv.gz'
-			caminho_dicionario = '../data/dictMesh.dict_eng.gz'
-			caminho_indice = '../data/indiceReversoEN.dict.gz'
+			caminho_evolucao = './data/excel_evol_eng.csv.gz'
+			caminho_dicionario = './data/dictMesh.dict_eng.gz'
+			caminho_indice = './data/indiceReversoEN.dict.gz'
 			definicao = 'Definition'
 			enviar = "Send"
 			termos_semelhantes = 'Similar terms'
@@ -193,7 +201,7 @@ class PacientePageView(TemplateView):
 
 		#Retorna pro template
 		
-		context['data'] = m['DATA EVOL']
+		context['data'] = formulario
 		context['registro'] = m['REG. PACIENTE']
 		context['evolucao'] = strr
 		context['indice_avancar'] = indice+1

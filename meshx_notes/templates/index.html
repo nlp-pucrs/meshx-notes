@@ -108,14 +108,30 @@
       function cbx3(){
           var arr = []/* Cria array com todos os names dos check selecionados */;
           var val = []/* Cria array com todos os values dos check selecionados */;
+          var serial = ""
           var inputElements = document.getElementsByClassName('radio') /* Busca todos os elementos com o class radio */;
           for(var i=0; inputElements[i]; ++i){
               if(inputElements[i].checked){ /* Verifique se o elemento em questão está com o atributo checked marcado */
-                arr.push(inputElements[i].name+" "+inputElements[i].value) /* Inclui name do elemento em um array*/;
+                serial += inputElements[i].name+" "+inputElements[i].value+"- " /* Inclui name do elemento em um array*/
               }
           }
-          alert(arr)
-          return arr/* Retorna esse array */;
+
+          //$.get( "index.html", {radio_validacao: serial  } );
+
+           $.ajax({
+                url: '../views_mesh.py',
+                data: serial,
+                type: 'get',
+                success: function(response) {
+                    alert('response');
+                },
+                error: function(error) {
+                    alert('error');
+                }
+            });
+
+          alert(serial)
+          return serial/* Retorna esse array */;
       }
     </script>
  
