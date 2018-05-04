@@ -112,23 +112,23 @@
           var inputElements = document.getElementsByClassName('radio') /* Busca todos os elementos com o class radio */;
           for(var i=0; inputElements[i]; ++i){
               if(inputElements[i].checked){ /* Verifique se o elemento em questão está com o atributo checked marcado */
-                serial += inputElements[i].name+" "+inputElements[i].value+"- " /* Inclui name do elemento em um array*/
+                serial += inputElements[i].name+"_"+inputElements[i].value+"- " /* Inclui name do elemento em um array*/
               }
           }
 
-          //$.get( "index.html", {radio_validacao: serial  } );
+          $.get( "/valida?serial="+serial);
 
-           $.ajax({
-                url: '../views_mesh.py',
-                data: serial,
-                type: 'get',
-                success: function(response) {
-                    alert('response');
+           /*$.get({
+                url: '/meshx/valida/?name=werwer&',
+                //data: {radio_validacao : serial},
+                //type: 'GET',
+                success: function(data) {
+                    alert('radio_validacao: '+data);
                 },
                 error: function(error) {
                     alert('error');
                 }
-            });
+            });*/
 
           alert(serial)
           return serial/* Retorna esse array */;

@@ -21,7 +21,6 @@ import unicodedata
 
 from django.views.generic import TemplateView
 
-from .views_valida import ValidaClass
 
 #from .forms import valida
 
@@ -37,11 +36,8 @@ class PacientePageView(TemplateView):
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
 		#Verifica se ha formulario para salvar
-		formulario = self.request.GET.get('serial')
-
-		if formulario != None:
-			ValidaClass.salva_formulario(formulario)
-
+		formulario = self.request.GET.get('radio_validacao')
+		
 		#Verifica se ha idioma
 
 		lingua = self.request.GET.get('l')
@@ -162,9 +158,11 @@ class PacientePageView(TemplateView):
 				term = dictMesh[ID]['terms']
 
 				if valida == 2:
-					termos = '<br/>- '.join(term[0:len(term)-1])
+					#termos = '<br/>- '.join(term[0:len(term)-1])
+					termos = '<br/>- '.join(term)
 				else:
-					termos = '<br/>- '.join(term[0:len(term)-1])
+					#termos = '<br/>- '.join(term[0:len(term)-1])
+					termos = '<br/>- '.join(term)
 
 				if "</i>" in indice_termos:
 					termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"

@@ -23,9 +23,11 @@ from django.views.generic import TemplateView
 
 import gzip, pickle
 
-class ValidaClass():
+class ValidaPageView(TemplateView):
+	template_name = 'valida.html'
 
-	def salva_formulario(serial):
+	def get_context_data(self, **kwargs):
+		context = super(ValidaPageView, self).get_context_data(**kwargs)
 		current_path = os.path.dirname(os.path.realpath(__file__))
 		caminho_dicionario = './data/dictMesh.dict.gz'
 		caminho_indice = './data/indiceReversoPT.dict.gz'
@@ -46,11 +48,15 @@ class ValidaClass():
 			dictValida = pickle.load(fd)
 			fd.close()
 
-		dictValidaa = {}
+		serial = self.request.GET.get('serial')
 
 		posicoes = serial.split('-');
 
 		ID = posicoes[-1]
+
+		dictValidaa = {}
+
+		context['eu'] = "estou aqui funcionando!"
 
 		if ID != None:
 			if ID in dictMesh:
@@ -72,6 +78,7 @@ class ValidaClass():
 								for palavra in posicoes:
 									if new_indice in  palavra:
 										val_valida =  palavra[-1]
+										context['eu'] = "agora aqui!"
 							
 							#Poe no dicionario
 							if  val_valida != None:
@@ -93,3 +100,7 @@ class ValidaClass():
 				with gzip.open(caminho_valida,'wb') as fp:
 					pickle.dump(dictValidaa,fp)
 					fp.close()
+
+		#Outro para teste
+		
+		return context
