@@ -20,7 +20,8 @@ from .views_mesh import PacientePageView
 from .views_ea import EventoAdversoPageView
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^$', PacientePageView.as_view(), name='index'),
+    path('^$', PacientePageView.as_view(), name='index'),
     path('meshx/', PacientePageView.as_view(), name='index'),
     path('ea/', EventoAdversoPageView.as_view(), name='home')
 ]

@@ -25,7 +25,7 @@ SECRET_KEY = 'pnoqi#@r+k@woxe=l24y#1tzc%=(^dwgqgm3b#=9p+d_*o)9@='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['grupopln.inf.pucrs.br']
 
 
 # Application definition
