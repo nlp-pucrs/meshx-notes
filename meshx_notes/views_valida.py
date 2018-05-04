@@ -59,17 +59,21 @@ class ValidaPageView(TemplateView):
 		context['eu'] = "estou aqui funcionando!"
 
 		if ID != None:
+			context['eu'] = "agora aqui!"
 			if ID in dictMesh:
 				#for t in dictMesh[ID]:
 				#Poe a escolha do usuario aqui
 
 				val_valida = 2
 
+
 				termos = ' '.join(dictMesh[ID]['terms'])
 				for indice in indiceReverso:
 					if '<i>' in indice:
+
 						indice_list = indice.split(' ');
 						new_indice = indice_list[0]
+
 
 						if new_indice in ' '.join(dictMesh[ID]['terms']):
 							new_indice = new_indice.replace('</i>', '')
