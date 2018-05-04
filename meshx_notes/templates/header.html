@@ -1,19 +1,145 @@
 <!DOCTYPE html>
 <html lang= "en">
+ <style>
+  
+    body{
+        margin: 15px
+    }
+             
+    .table-bordered{
+        margin: 10px;
+    }
+                    
+    .pagination-action{
+        padding: 0.5em;
+        font-size: 3em;
+        display: inline-block;
+        color: #999999;
+    }
+    
+    .ea-row{
+        /*border:3px dotted red;*/
+        height: 80px;
+    }
+
+    .data-row{
+        /*border:3px dotted red;*/
+        height: 480px;
+    }
+
+    .butt-row{
+        margin: -10px;
+        /*border: 3px dotted red;*/
+        height: 60px;
+    }
+   
+    .bt-margin{
+        margin: 10px;
+    }                                                  
+    
+    .bt-margin1{
+        margin: 10px;
+    }
+    
+    .table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    .button{
+        display: inline;
+    }
+
+    .dados{
+        margin-left: 10px
+    }
+    
+</style>
 
 <head>
         <title>Clinical Web Notes</title>
         <meta charset="utf-8" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
+        <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
 </head>
 
 <body class="body" style="background-color: white">
-    <span class="oi oi-icon-name" title="icon name" aria-hidden="true"></span>
-    <div>    
-        {% block content %}
-        {% endblock %}
+    
+<div class="row ea-row align-items-center">
+
+        <div class="col-10 my-col">
+            <br><br>
+                <table class="table table-bordered table-light" style="width:100%">
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Resumo do Evento</th>
+                            <th>Registro</th>
+                            <th>Evento</th>
+                            <th>Sexo</th>
+                            <th>ID</th>
+                            <th>Gravidade</th>
+                
+                        </tr>
+                        <tr>
+                            <td>{{ data_ea }}</td>
+                            <td>{{ tipo }}</td>
+                            <td>{{ resumo_evento }}</td>
+                            <td>{{ registro_ea }}</td>
+                            <td>{{ evento }}</td>
+                            <td>{{ sexo }}</td>
+                            <td>{{ ID }}</td>
+                            <td>{{ gravidade }}</td>                      
+                        </tr>
+                    </table>
+        </div>
+        <div class="col-1 pagination-action">
+            {% if indice_retornar_ea != -1 %}
+                <a href="?id_ea={{indice_retornar_ea}}"><i class="far fa-arrow-alt-circle-left"></i><a/>
+            {% endif %}        
+        </div>
+        <div class="col-1 pagination-action">
+            {% if indice_avancar_ea != ultima_posicao_ea %}
+                <a href="?id_ea={{indice_avancar_ea}}"><i class="far fa-arrow-alt-circle-right"></i></a>
+            {% endif %}    
+        </div>    
+    </div>
+      <div class="row data-row align-items-center" style="display:flex" >
+        <div class="col-10 my-col">
+            <br><br>     
+            <div class="card my-4 dados">
+                    <h5 class="card-header">{{ data_evolucao }}</h5>
+                    <div class="card-body"> {{ evolucao }} </div>
+            </div>    
+        </div>
+        <div class="col-1 pagination-action" hrf="?page={{"polls/urls"}}">
+            {% if indice_retornar_evol  != -1 %}
+                <a href="?id_evol={{indice_retornar_evol}}"><i class="far fa-arrow-alt-circle-left"></i>
+            {% endif%}              
+        </div>
+        <div class="col-1 pagination-action">
+            {% if indice_retornar_evol != ultima_posicao_evol %}
+                <a href="?id_evol={{indice_avancar_evol}}"><i class="far fa-arrow-alt-circle-right"></i><a/>
+            {% endif %}
+        </div>
+      </div>
+
+    <div class="row butt-row align-items-end">
+
+            <div class="col-1 bt-margin1">
+                <button type="button" class="btn btn-success button">
+                    Vincular
+                    <i class="fas fa-check"></i>
+                </button></div>
+
+            <div class="col-1 bt-margin">
+                <button type="button" class="btn btn-danger button">
+                    Desvincular
+                    <i class="fas fa-times"></i>
+                </button></div>
+                    <div class="col-9"></div>    
+            </div>
     </div>
 </body>
-
 </html>
