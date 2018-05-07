@@ -116,7 +116,9 @@
               }
           }
 
-          $.get( "/valida?serial="+serial);
+          ID = document.getElementsByClassName('hidden')
+
+          $.get( "/valida?serial="+serial+"?ID="+ID);
 
            /*$.get({
                 url: '/meshx/valida/?name=werwer&',

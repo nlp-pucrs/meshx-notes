@@ -52,14 +52,11 @@ class ValidaPageView(TemplateView):
 
 		posicoes = serial.split('-');
 
-		ID = posicoes[-1]
-
-		dictValidaa = {}
+		ID = self.request.GET.get('ID')
 
 		context['eu'] = "estou aqui funcionando!"
 
 		if ID != None:
-			context['eu'] = "agora aqui!"
 			if ID in dictMesh:
 				#for t in dictMesh[ID]:
 				#Poe a escolha do usuario aqui
@@ -70,6 +67,7 @@ class ValidaPageView(TemplateView):
 				termos = ' '.join(dictMesh[ID]['terms'])
 				for indice in indiceReverso:
 					if '<i>' in indice:
+						val_valida = 2
 
 						indice_list = indice.split(' ');
 						new_indice = indice_list[0]
@@ -82,27 +80,18 @@ class ValidaPageView(TemplateView):
 								for palavra in posicoes:
 									if new_indice in  palavra:
 										val_valida =  palavra[-1]
-										context['eu'] = "agora aqui!"
-							
+										
 							#Poe no dicionario
-							if  val_valida != None:
-								dictValidaa[new_indice] = {
+							if  val_valida != 2:
+								dictValida[new_indice] = {
 									'ID': ID,
 									'target': val_valida
 								}
-							elif val_valida == None:
-								try:
-									dictValidaa[new_indice] = {
-										'ID': dictValida[new_indice]['ID'],
-										'target': dictValida[new_indice]['target']
-									}
-								except KeyError:
-									pass
 								
 
 			#Salva o dicionario
 				with gzip.open(caminho_valida,'wb') as fp:
-					pickle.dump(dictValidaa,fp)
+					pickle.dump(dictValida,fp)
 					fp.close()
 
 		#Outro para teste
