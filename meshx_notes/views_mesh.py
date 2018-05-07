@@ -35,10 +35,9 @@ class PacientePageView(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(PacientePageView, self).get_context_data(**kwargs)
 
-		#Verifica se ha formulario para salvar
-		formulario = self.request.GET.get('radio_validacao')
-		
 		#Verifica se ha idioma
+
+		formulario = "teste"
 
 		lingua = self.request.GET.get('l')
 
@@ -49,6 +48,7 @@ class PacientePageView(TemplateView):
 			caminho_evolucao = './data/excel_evol.csv.gz'
 			caminho_dicionario = './data/dictMesh.dict.gz'
 			caminho_indice = './data/indiceReversoPT.dict.gz'
+			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definicao'
 			enviar = "Enviar"
 			termos_semelhantes = 'Termos semelhantes'
@@ -65,6 +65,7 @@ class PacientePageView(TemplateView):
 		caminho_evolucao = os.path.join(current_path, caminho_evolucao)
 		caminho_dicionario = os.path.join(current_path, caminho_dicionario)
 		caminho_indice = os.path.join(current_path, caminho_indice)
+		caminho_valida = os.path.join(current_path, caminho_valida)
 
 		prescription = pd.read_csv(caminho_evolucao, compression='gzip', nrows=50000)
 
@@ -94,6 +95,20 @@ class PacientePageView(TemplateView):
 		with gzip.open(caminho_dicionario,'rb') as fd:
 			dictMesh = pickle.load(fd)
 			fd.close()
+
+		with gzip.open(caminho_valida,'rb') as fd:
+			dictValida = pickle.load(fd)
+			fd.close()
+
+		#Lista com os termos ja verificados dos semelhantes
+		verificados = []
+		verificados_val = []
+
+		for IDD in dictValida:
+			verificados.append(IDD)
+			verificados_val.append(dictValida[IDD]['target'])
+		
+		verificados_val
 
 		#Verifica a lista para ver se a palavra esta no dicionario
 		valida = 0
@@ -157,14 +172,20 @@ class PacientePageView(TemplateView):
 				ID = indiceReverso[indice_termos]['ID']	
 				term = dictMesh[ID]['terms']
 
-				if valida == 2:
-					#termos = '<br/>- '.join(term[0:len(term)-1])
-					termos = '<br/>- '.join(term)
-				else:
-					#termos = '<br/>- '.join(term[0:len(term)-1])
-					termos = '<br/>- '.join(term)
+				'''for t in range(len(term)):
+																							if('<input' in term[t]):
+																								for IDD in dictValida:
+																									if(IDD in term[t]):
+																										if(dictValida[IDD]['target'] == '0'):
+																											termos = term[t].split("value='1'/>'");
+																											formulario = "ta"
+																											novo = termos[0]+'checked '+termos[1]
+																										term[t] = novo		'''						
+				termos = '<br/>- '.join(term[0:-1])
+				termos += ''.join(term[-1])
+				#termos = '<br/>- '.join(term)
 
-				if "</i>" in indice_termos:
+				if "</i>" in termos:
 					termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
 				
 				#Verifica o qualifier, se ha, entao salva, senao bota vazio
@@ -199,7 +220,8 @@ class PacientePageView(TemplateView):
 
 		#Retorna pro template
 		
-		context['data'] = formulario
+		context['data'] =  formulario
+		#m['DATA EVOL']
 		context['registro'] = m['REG. PACIENTE']
 		context['evolucao'] = strr
 		context['indice_avancar'] = indice+1
@@ -207,4 +229,6 @@ class PacientePageView(TemplateView):
 		context['indice_retornar'] = indice-1
 		context['ultima_posicao'] = len(prescription.loc[::])
 		context['lingua'] = lingua
+		context['verificados'] = verificados
+		context['verificados_val'] = verificados_val
 		return context

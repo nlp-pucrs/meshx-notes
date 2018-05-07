@@ -100,6 +100,10 @@
                  $("#relacionados").html($(this).attr("data-terms"));
                  $("#nome").html($(this).attr("data-name"));
                  $("#id").html($(this).attr("data-id"));
+
+                {% for ver in verificados %}
+                  document.getElementsByName("{{ver}}")[0].checked = true;
+                {% endfor %}
           });
       });
     </script>
@@ -116,25 +120,12 @@
               }
           }
 
-          ID = document.getElementsByClassName('hidden')
+          ID = document.getElementsByName("ID")[0].value;
 
-          $.get( "/valida?serial="+serial+"?ID="+ID);
+          $.get( "/valida?serial="+serial+"&ID="+ID);
 
-           /*$.get({
-                url: '/meshx/valida/?name=werwer&',
-                //data: {radio_validacao : serial},
-                //type: 'GET',
-                success: function(data) {
-                    alert('radio_validacao: '+data);
-                },
-                error: function(error) {
-                    alert('error');
-                }
-            });*/
-
-          alert(serial)
-          return serial/* Retorna esse array */;
-      }
+          alert("Enviado com sucesso")
+      }    
     </script>
  
   </head>
@@ -237,7 +228,7 @@
                     <li>
                         <a>
                           <div class="foo black"></div> &nbsp;
-                          {% if lingua == "pt" %} Procedimento 
+                          {% if lingua == "pt" %} Procedimento
                           {% else %} Procedure {% endif %}
 
                         </a>
@@ -289,6 +280,7 @@
                 <!--<form name="valida" action="../valida" method="GET">-->
                     <input type="hidden" name="id" value="{{ indice }}"/> 
                     <input type="hidden" name="l" value="{{ lingua }}"/> 
+                    Eu estou aqui<input type='radio' name='eu' value='1'/>
                     <div id="relacionados"></div>
                <!-- </form>-->
               </div>
