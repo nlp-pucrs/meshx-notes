@@ -1,145 +1,222 @@
-<!DOCTYPE html>
-<html lang= "en">
- <style>
-  
-    body{
-        margin: 15px
-    }
-             
-    .table-bordered{
-        margin: 10px;
-    }
-                    
-    .pagination-action{
-        padding: 0.5em;
-        font-size: 3em;
-        display: inline-block;
-        color: #999999;
-    }
-    
-    .ea-row{
-        /*border:3px dotted red;*/
-        height: 80px;
+<html lang="en">
+<style>
+    .footer {
+        /*position:absolute;*/
+        bottom:-200;
+        width:100%;
+        height:40px;      /* Height of the footer */
+        left: 0px;
+        background:#6cf;
     }
 
-    .data-row{
-        /*border:3px dotted red;*/
-        height: 480px;
+    .menu {
+        border-left: 1px solid transparent;
+        border-left-color: gray;
+        transition: border 1s linear;
     }
 
-    .butt-row{
-        margin: -10px;
-        /*border: 3px dotted red;*/
-        height: 60px;
-    }
-   
-    .bt-margin{
-        margin: 10px;
-    }                                                  
-    
-    .bt-margin1{
-        margin: 10px;
-    }
-    
-    .table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
+    .foo {
+        float: left;
+        width: 20px;
+        height: 19px;
+        margin: 0px;
+        border: 2px solid rgba(0, 0, 0, 0.336); 
     }
 
-    .button{
-        display: inline;
+    .my-container{
+       border: 1px solid blue; 
+       max-width: 1000px;
+       width: 500px;
+       height: 1023px 
     }
 
-    .dados{
-        margin-left: 10px
+    .my-column{
+        border: 1px solid yellow
+    }
+
+    .text-center {
+        text-align:center;
+        align-content:flex-start
+    }
+
+    .butt-ea{
+        font-size: 1em;
+        margin-top: 1.6em;
+        color: black
+    }
+
+    .butt-evol{
+        font-size: 1em;
+        margin-top: 2em;
+        color: black
+    }
+
+    .ea-table{
+        margin-top: 0.5em
+    }
+
+    .card-ea{
+        height: 3.2em;
+    }
+    .card-evol{
+        height: 3.6em;
+    }
+    .car-ea{
+        margin-top: 2em;
     }
     
+    .custom-control-label:before{
+        background-color:red;
+    }
+    .custom-checkbox .custom-control-input:checked~.custom-control-label::before{
+        background-color:black;
+    }
+
+
 </style>
+  <head>
 
-<head>
-        <title>Clinical Web Notes</title>
-        <meta charset="utf-8" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
-        <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
-</head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-<body class="body" style="background-color: white">
-    
-<div class="row ea-row align-items-center">
+    <title>Clinical Web Notes</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+ 
+  </head>
 
-        <div class="col-10 my-col">
-            <br><br>
-                <table class="table table-bordered table-light" style="width:100%">
-                        <tr>
-                            <th>Data</th>
-                            <th>Tipo</th>
-                            <th>Resumo do Evento</th>
-                            <th>Registro</th>
-                            <th>Evento</th>
-                            <th>Sexo</th>
-                            <th>ID</th>
-                            <th>Gravidade</th>
-                
-                        </tr>
-                        <tr>
-                            <td>{{ data_ea }}</td>
-                            <td>{{ tipo }}</td>
-                            <td>{{ resumo_evento }}</td>
-                            <td>{{ registro_ea }}</td>
-                            <td>{{ evento }}</td>
-                            <td>{{ sexo }}</td>
-                            <td>{{ ID }}</td>
-                            <td>{{ gravidade }}</td>                      
-                        </tr>
-                    </table>
-        </div>
-        <div class="col-1 pagination-action">
-            {% if indice_retornar_ea != -1 %}
-                <a href="?id_ea={{indice_retornar_ea}}"><i class="far fa-arrow-alt-circle-left"></i><a/>
-            {% endif %}        
-        </div>
-        <div class="col-1 pagination-action">
-            {% if indice_avancar_ea != ultima_posicao_ea %}
-                <a href="?id_ea={{indice_avancar_ea}}"><i class="far fa-arrow-alt-circle-right"></i></a>
-            {% endif %}    
-        </div>    
-    </div>
-      <div class="row data-row align-items-center" style="display:flex" >
-        <div class="col-10 my-col">
-            <br><br>     
-            <div class="card my-4 dados">
-                    <h5 class="card-header">{{ data_evolucao }}</h5>
-                    <div class="card-body"> {{ evolucao }} </div>
-            </div>    
-        </div>
-        <div class="col-1 pagination-action" hrf="?page={{"polls/urls"}}">
-            {% if indice_retornar_evol  != -1 %}
-                <a href="?id_evol={{indice_retornar_evol}}"><i class="far fa-arrow-alt-circle-left"></i>
-            {% endif%}              
-        </div>
-        <div class="col-1 pagination-action">
-            {% if indice_retornar_evol != ultima_posicao_evol %}
-                <a href="?id_evol={{indice_avancar_evol}}"><i class="far fa-arrow-alt-circle-right"></i><a/>
-            {% endif %}
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Clinical Web Notes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">   
+            <li class="nav-item menu">  </li>
+               <a class="nav-link" href="?id={{ meshx_notes }}"> MeSHx-Notes</a>
+            </a>
+            </li>
+          </ul>
         </div>
       </div>
+    </nav>
 
-    <div class="row butt-row align-items-end">
-
-            <div class="col-1 bt-margin1">
-                <button type="button" class="btn btn-success button">
-                    Vincular
-                    <i class="fas fa-check"></i>
-                </button></div>
-
-            <div class="col-1 bt-margin">
-                <button type="button" class="btn btn-danger button">
-                    Desvincular
-                    <i class="fas fa-times"></i>
-                </button></div>
-                    <div class="col-9"></div>    
+    <!-- Page Content -->
+    <br><br><br>
+    <div class="container my-container">
+        <div class="row row-ea">
+            <div class="col-md-10 my-column">
+                <div class="card my-4">
+                    <h4 class="card-header card-ea align-text-top"> {{ data_ea }} | {{ registro_ea }} &nbsp;&nbsp; 
+                        {% if indice_retornar_ea != -1 %}
+                            <a href="?id_ea={{indice_retornar_ea}}"><i class="fas fa-caret-square-left butt-ea"></i></a>
+                        {% endif %}
+                            &nbsp; &nbsp;
+                        {% if indice_avancar_ea != ultima_posicao_ea %} 
+                            <a href="?id_ea={{indice_avancar_ea}}"><i class="fas fa-caret-square-right butt-ea"></i></a>
+                        {% endif %}
+                    
+                    </h4>
+                    <div class="card-body align-text-top"> 
+                        <table class="table table-bordered table-light ea-table" style="width:100%">
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Resumo do Evento</th>
+                                <th>Evento</th>
+                                <th>Sexo</th>
+                                <th>ID</th>
+                                <th>Gravidade</th>
+                            </tr>
+                            <tr>
+                                <td>{{ tipo }}</td> 
+                                <td>{{ resumo_evento }}</td>
+                                <td>{{ evento }}</td>
+                                <td>{{ sexo }}</td>
+                                <td>{{ ID }}</td>
+                                <td>{{ gravidade }}</td>                      
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
+            <div class="col-md-2 my-column">
+                <div class="card car-ea">
+                    <h5 class="card-header"> EA </h5>
+                    <div class="card-body">
+                            <div class="custom-control custom-checkbox">  
+                                    <input type="checkbox" class="custom-control-input" id="customCheck1">  
+                                    <label class="custom-control-label" for="customCheck1">Check this</label>  
+                            </div>
+                            <div class="custom-control custom-checkbox">  
+                                    <input type="checkbox" class="custom-control-input" id="customCheck2">  
+                                    <label class="custom-control-label" for="customCheck2">Check this</label>  
+                            </div>   
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row row-evol">
+                <div class="col-md-10 my-column">
+                        <button type="button" class="btn btn-success button">
+                                Vincular &nbsp;
+                                <i class="fas fa-check"></i>
+                        </button> &nbsp; &nbsp;
+                        <button type="button" class="btn btn-danger button">
+                                Desvincular &nbsp;
+                                <i class="fas fa-times"></i>
+                            </button>
+                        <div class="card my-4">
+                                <h4 class="card-header card-evol">{{ data_evolucao }} | {{ registro_evol }} &nbsp; &nbsp;
+                                    {% if indice_retornar_evol != primeira_posicao_evol and registro_evol == registro_ea %}
+                                        <a href="?id_evol={{indice_retornar_evol}}&id_ea={{indice_ea}}"><i class="fas fa-caret-square-left butt-evol"></i></a>
+                                    {% endif %} 
+                                        &nbsp; 
+                                    {% if indice_avancar_evol != ultima_posicao_evol and registro_evol == registro_ea %}
+                                        <a href="?id_evol={{indice_avancar_evol}}&id_ea={{indice_ea}}"><i class="fas fa-caret-square-right butt-evol"></i></a>
+                                    {% endif %}
+                                </h4>
+                                <div class="card-body"> {{ evolucao }} </div>  
+                        </div>    
+                </div>
+                <div class="col-md-2 my-column text-center">
+                        <div class="card car-ea">
+                                <h5 class="card-header"> Evolução </h5>
+                                <div class="card-body">
+                                        <div class="custom-control custom-checkbox">  
+                                                <input type="checkbox" class="custom-control-input" id="customCheck3">  
+                                                <label class="custom-control-label" for="customCheck3">Check this</label>  
+                                        </div>
+                                        <div class="custom-control custom-checkbox">  
+                                                <input type="checkbox" class="custom-control-input" id="customCheck4">  
+                                                <label class="custom-control-label" for="customCheck4">Check this</label>  
+                                        </div>   
+                                </div>
+                </div>
+        </div>
     </div>
-</body>
-</html>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer class="py-2 bg-dark footer">
+      <div class="container">
+        <p class="m-0 text-center text-white">Clinical Web Notes | 
+          <a class="text-white" target= '_blank' href="http://www.inf.pucrs.br/linatural/wordpress/"> Grupo de PLN - PUCRS  </a>
+        </p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+</html> 
