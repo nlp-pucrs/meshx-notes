@@ -56,6 +56,7 @@ class PacientePageView(TemplateView):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
 			caminho_dicionario = './data/dictMesh.dict_eng.gz'
 			caminho_indice = './data/indiceReversoEN.dict.gz'
+			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definition'
 			enviar = "Send"
 			termos_semelhantes = 'Similar terms'
@@ -102,13 +103,15 @@ class PacientePageView(TemplateView):
 
 		#Lista com os termos ja verificados dos semelhantes
 		verificados = []
-		verificados_val = []
 
 		for IDD in dictValida:
-			verificados.append(IDD)
-			verificados_val.append(dictValida[IDD]['target'])
-		
-		verificados_val
+			# cria a linha i
+			linha = [] # lista vazia
+			linha.append(IDD)
+			linha.append(dictValida[IDD]['target'])
+
+			# coloque linha na matriz
+			verificados.append(linha)
 
 		#Verifica a lista para ver se a palavra esta no dicionario
 		valida = 0
@@ -172,15 +175,6 @@ class PacientePageView(TemplateView):
 				ID = indiceReverso[indice_termos]['ID']	
 				term = dictMesh[ID]['terms']
 
-				'''for t in range(len(term)):
-																							if('<input' in term[t]):
-																								for IDD in dictValida:
-																									if(IDD in term[t]):
-																										if(dictValida[IDD]['target'] == '0'):
-																											termos = term[t].split("value='1'/>'");
-																											formulario = "ta"
-																											novo = termos[0]+'checked '+termos[1]
-																										term[t] = novo		'''						
 				termos = '<br/>- '.join(term[0:-1])
 				termos += ''.join(term[-1])
 				#termos = '<br/>- '.join(term)
@@ -230,5 +224,4 @@ class PacientePageView(TemplateView):
 		context['ultima_posicao'] = len(prescription.loc[::])
 		context['lingua'] = lingua
 		context['verificados'] = verificados
-		context['verificados_val'] = verificados_val
 		return context

@@ -100,10 +100,7 @@
                  $("#relacionados").html($(this).attr("data-terms"));
                  $("#nome").html($(this).attr("data-name"));
                  $("#id").html($(this).attr("data-id"));
-
-                {% for ver in verificados %}
-                  document.getElementsByName("{{ver}}")[0].checked = true;
-                {% endfor %}
+                 checa();
           });
       });
     </script>
@@ -124,8 +121,17 @@
 
           $.get( "/valida?serial="+serial+"&ID="+ID);
 
-          alert("Enviado com sucesso")
+          alert("Enviado com sucesso, os dados serão atualizados na próxima sessão")
       }    
+
+
+      function checa() {
+          {% for ver, target in verificados %}
+            if ( jQuery( "input[name={{ver}}]" ).length )
+             document.getElementsByName("{{ver}}")[({{target}}-1)*-1].checked = true;
+          {% endfor %}
+      }
+
     </script>
  
   </head>
@@ -280,7 +286,6 @@
                 <!--<form name="valida" action="../valida" method="GET">-->
                     <input type="hidden" name="id" value="{{ indice }}"/> 
                     <input type="hidden" name="l" value="{{ lingua }}"/> 
-                    Eu estou aqui<input type='radio' name='eu' value='1'/>
                     <div id="relacionados"></div>
                <!-- </form>-->
               </div>
