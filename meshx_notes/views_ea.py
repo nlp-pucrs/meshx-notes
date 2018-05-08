@@ -48,8 +48,6 @@ class EventoAdversoPageView(TemplateView):
                 context['ultima_posicao_evol'] = len(evolucao.loc[::])
                 context['primeira_posicao_evol'] = 15
 
-
-
         m = evolucao.loc[indice_evolucao]
 
         n = ea.loc[indice_ea]
