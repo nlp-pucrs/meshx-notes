@@ -29,7 +29,7 @@ class ValidaPageView(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(ValidaPageView, self).get_context_data(**kwargs)
 		current_path = os.path.dirname(os.path.realpath(__file__))
-		caminho_dicionario = './data/dictMesh.dict.gz'
+		caminho_dicionario = './data/dictMesh_new.dict.gz'
 		caminho_indice = './data/indiceReversoPT.dict.gz'
 		caminho_valida = './data/dictValida.dict.gz'
 		caminho_dicionario = os.path.join(current_path, caminho_dicionario)
