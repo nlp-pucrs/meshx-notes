@@ -46,21 +46,7 @@ class EventoAdversoPageView(TemplateView):
             else:
                 indice_evolucao = int(self.request.GET.get('id_evol'))
                 context['ultima_posicao_evol'] = len(evolucao.loc[::])
-                context['primeira_posicao_evol'] = 15
-
-        if(self.request.GET.get('id_vincular') == None):
-            index_ea = int(self.request.GET.get('id_ea'))
-            ea.loc[index_ea, 'EVOLUCAO VINCULADA'] = 10
-        else:
-            index_ea = int(self.request.GET.get('id_ea'))
-            index_evol = int(self.request.GET.get('id_evol'))
-            ea.loc[index_ea, 'EVOLUCAO VINCULADA'] = index_evol
-            
-
-        if (self.request.GET.get('id_desvincular') != None):
-            index_ea = int(self.request.GET.get('id_ea'))
-            ea.loc[index_ea, 'EVOLUCAO VINCULADA'] = -1
-                        
+                context['primeira_posicao_evol'] = 15                      
 
         m = evolucao.loc[indice_evolucao]
 
