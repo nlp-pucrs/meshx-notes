@@ -73,6 +73,12 @@
         background-color:black;
     }
 
+    .scroll-box {
+        overflow-y: scroll;
+        height: 150px;
+        padding: 1rem
+    }
+
 
 </style>
   <head>
@@ -134,6 +140,7 @@
                                 <th>Sexo</th>
                                 <th>ID</th>
                                 <th>Gravidade</th>
+                                <th>Evol Vinculada</th>
                             </tr>
                             <tr>
                                 <td>{{ tipo }}</td> 
@@ -141,7 +148,8 @@
                                 <td>{{ evento }}</td>
                                 <td>{{ sexo }}</td>
                                 <td>{{ ID }}</td>
-                                <td>{{ gravidade }}</td>                      
+                                <td>{{ gravidade }}</td>
+                                <td> {{ evol_vinculada }} </td>                      
                             </tr>
                         </table>
                     </div>
@@ -150,7 +158,7 @@
             <div class="col-md-3 column-check-ea">
                 <div class="card car-ea">
                     <h5 class="card-header"> EA </h5>
-                    <div class="card-body">
+                    <div class="card-body scroll-box">
                             <div class="custom-control custom-checkbox">  
                                     <input type="checkbox" class="custom-control-input" id="customCheck1">  
                                     <label class="custom-control-label" for="customCheck1">Check this</label>  
@@ -158,7 +166,27 @@
                             <div class="custom-control custom-checkbox">  
                                     <input type="checkbox" class="custom-control-input" id="customCheck2">  
                                     <label class="custom-control-label" for="customCheck2">Check this</label>  
-                            </div>   
+                            </div>  
+                            <div class="custom-control custom-checkbox">  
+                                <input type="checkbox" class="custom-control-input" id="customCheck3">  
+                                <label class="custom-control-label" for="customCheck3">Check this</label>  
+                            </div>
+                            <div class="custom-control custom-checkbox">  
+                                <input type="checkbox" class="custom-control-input" id="customCheck4">  
+                                <label class="custom-control-label" for="customCheck4">Check this</label>  
+                            </div> 
+                            <div class="custom-control custom-checkbox">  
+                                <input type="checkbox" class="custom-control-input" id="customCheck4">  
+                                <label class="custom-control-label" for="customCheck4">Check this</label>  
+                            </div> 
+                            <div class="custom-control custom-checkbox">  
+                                <input type="checkbox" class="custom-control-input" id="customCheck4">  
+                                <label class="custom-control-label" for="customCheck4">Check this</label>  
+                            </div> 
+                            <div class="custom-control custom-checkbox">  
+                                <input type="checkbox" class="custom-control-input" id="customCheck4">  
+                                <label class="custom-control-label" for="customCheck4">Check this</label>  
+                            </div> 
                     </div>
                 </div>
             </div>
@@ -166,21 +194,23 @@
         <hr>
         <div class="row row-evol">
                 <div class="col-md-9 my-column">
-                        <button type="button" class="btn btn-success button">
+                        <a href="?id_vincular={{id_ea}}&{{id_evol}}"></a><button type="button" class="btn btn-success button" name="vincular">
                                 Vincular &nbsp;
                                 <i class="fas fa-check"></i>
                         </button> &nbsp; &nbsp;
-                        <button type="button" class="btn btn-danger button">
+                        {% if evol_vinculada  == indice_evol %}
+                        <a href="?id_desvincular={{id_ea}}&{{id_evol}}"></a><button type="button" class="btn btn-danger button">
                                 Desvincular &nbsp;
                                 <i class="fas fa-times"></i>
-                            </button>
+                        </button>
+                        {% endif %}
                         <div class="card my-4">
                                 <h4 class="card-header card-evol">{{ data_evolucao }} | {{ registro_evol }} 
-                                    {% if indice_retornar_evol != ultima_posicao_evol and registro_evol == registro_ea %}
+                                    {% if indice_avancar_evol != ultima_posicao_evol and registro_evol == registro_ea %}
                                         <a href="?id_evol={{indice_avancar_evol}}&id_ea={{indice_ea}}"><i class="fas fa-caret-square-right butt-evol"></i></a>
                                     {% endif %} 
                                         &nbsp; 
-                                    {% if indice_avancar_evol != primeira_posicao_evol and registro_evol == registro_ea %}
+                                    {% if indice_retornar_evol != primeira_posicao_evol and registro_evol == registro_ea %}
                                         <a href="?id_evol={{indice_retornar_evol}}&id_ea={{indice_ea}}"><i class="fas fa-caret-square-left butt-evol"></i></a>
                                     {% endif %}
                                 </h4>
@@ -192,17 +222,17 @@
                                 <h5 class="card-header"> Evolução </h5>
                                 <div class="card-body">
                                         <div class="custom-control custom-checkbox">  
-                                                <input type="checkbox" class="custom-control-input" id="customCheck3">  
-                                                <label class="custom-control-label" for="customCheck3">Check this</label>  
+                                                <input type="checkbox" class="custom-control-input" id="customChecks1">  
+                                                <label class="custom-control-label" for="customChecks1">Check this</label>  
                                         </div>
                                         <div class="custom-control custom-checkbox">  
-                                                <input type="checkbox" class="custom-control-input" id="customCheck4">  
-                                                <label class="custom-control-label" for="customCheck4">Check this</label>  
+                                            <input type="checkbox" class="custom-control-input" id="customChecks2">  
+                                            <label class="custom-control-label" for="customChecks2">Check this</label>  
                                         </div>   
                                 </div>
+                        </div>
                 </div>
         </div>
-    </div>
     <!-- /.container -->
 
     <!-- Footer -->
