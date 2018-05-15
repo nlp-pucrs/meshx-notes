@@ -29,7 +29,7 @@ class ValidaPageView(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(ValidaPageView, self).get_context_data(**kwargs)
 		current_path = os.path.dirname(os.path.realpath(__file__))
-		caminho_dicionario = './data/dictMesh_new.dict.gz'
+		caminho_dicionario = './data/dictMesh.dict.gz'
 		caminho_indice = './data/indiceReversoPT.dict.gz'
 		caminho_valida = './data/dictValida.dict.gz'
 		caminho_dicionario = os.path.join(current_path, caminho_dicionario)
@@ -54,8 +54,6 @@ class ValidaPageView(TemplateView):
 
 		ID = self.request.GET.get('ID')
 
-		context['eu'] = "estou aqui funcionando!"
-
 		if ID != None:
 			if ID in dictMesh:
 				#for t in dictMesh[ID]:
@@ -63,19 +61,14 @@ class ValidaPageView(TemplateView):
 
 				val_valida = 2
 
-
 				termos = ' '.join(dictMesh[ID]['terms'])
 				for indice in indiceReverso:
 					if '<i>' in indice:
 						val_valida = 2
 
-						indice_list = indice.split(' ');
-						new_indice = indice_list[0]
-
+						new_indice = indice.replace.replace('_i', '')
 
 						if new_indice in ' '.join(dictMesh[ID]['terms']):
-							new_indice = new_indice.replace('</i>', '')
-							new_indice = new_indice.replace('<i>', '')
 							if new_indice in serial:
 								for palavra in posicoes:
 									if new_indice in  palavra:

@@ -119,6 +119,9 @@
 
           ID = document.getElementsByName("ID")[0].value;
 
+
+          alert(serial)
+
           $.get( "/valida?serial="+serial+"&ID="+ID);
 
           alert("Enviado com sucesso, os dados serão atualizados na próxima sessão")
