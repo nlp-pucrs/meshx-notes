@@ -215,8 +215,7 @@ class PacientePageView(TemplateView):
 
 		#Retorna pro template
 		
-		context['data'] =  formulario
-		#m['DATA EVOL']
+		context['data'] =  m['DATA EVOL']
 		context['registro'] = m['REG. PACIENTE']
 		context['evolucao'] = strr
 		context['indice_avancar'] = indice+1

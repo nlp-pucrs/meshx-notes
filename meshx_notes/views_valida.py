@@ -63,10 +63,11 @@ class ValidaPageView(TemplateView):
 
 				termos = ' '.join(dictMesh[ID]['terms'])
 				for indice in indiceReverso:
-					if '<i>' in indice:
+					if '_i' in indice:
+						context['eu'] = "estou aqui!"
 						val_valida = 2
 
-						new_indice = indice.replace.replace('_i', '')
+						new_indice = indice.replace(' _i', '')
 
 						if new_indice in ' '.join(dictMesh[ID]['terms']):
 							if new_indice in serial:
