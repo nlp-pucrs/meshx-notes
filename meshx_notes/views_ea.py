@@ -12,14 +12,18 @@ class EventoAdversoPageView(TemplateView):
         context = super(EventoAdversoPageView, self).get_context_data(**kwargs)
 
         caminho_evolucao = './data/excel_evol.csv.gz'
-        caminho_ea = './data/excel_ea.csv.gz'
+        caminho_ea =      './data/excel_ea.csv.gz'
+        caminho_vincula = './data/vincula.csv'
 
         current_path = os.path.dirname(os.path.realpath(__file__))
         caminho_evolucao = os.path.join(current_path, caminho_evolucao)
         caminho_ea  = os.path.join(current_path, caminho_ea)
+        caminho_vincula = os.path.join(current_path, caminho_vincula)
 
         evolucao = pd.read_csv(caminho_evolucao, compression='gzip')
         ea = pd.read_csv(caminho_ea, compression='gzip')
+        vincula = pd.read_csv(caminho_vincula)
+
 
         indice_ea = 0
         indice_evolucao = 0
@@ -33,7 +37,7 @@ class EventoAdversoPageView(TemplateView):
             if(indice_ea == 0):
                 indice_evolucao = 0
                 context['ultima_posicao_evol'] = 16
-                context['primeira_posicao_evol'] = -1 
+                context['primeira_posicao_evol'] = -1
             else:
                 indice_evolucao = 16
                 context['ultima_posicao_evol'] = len(evolucao.loc[::])
@@ -46,21 +50,22 @@ class EventoAdversoPageView(TemplateView):
             else:
                 indice_evolucao = int(self.request.GET.get('id_evol'))
                 context['ultima_posicao_evol'] = len(evolucao.loc[::])
-                context['primeira_posicao_evol'] = 15                      
+                context['primeira_posicao_evol'] = 15
+        
 
+        l = vincula.loc[indice_ea]
         m = evolucao.loc[indice_evolucao]
-
         n = ea.loc[indice_ea]
     
-        # Evolucao context
+        # Context da Evolução
         context['data_evolucao'] = m['DATA EVOL'] 
         context['registro_evol'] = m['REG. PACIENTE']
         context['evolucao'] = m['DADOS DA EVOLUÇÃO']
         context['indice_avancar_evol'] = indice_evolucao + 1
         context['indice_evol'] = indice_evolucao
-        context['indice_retornar_evol'] = indice_evolucao - 1
+        context['indice_retornar_evol'] = indice_evolucao - 1   
 
-        # EA context
+        # Context do Evento Adverso
         context['data_ea'] = n['DATA']
         context['tipo'] = n['TIPO']
         context['resumo_evento'] = n['RESUMO DO EVENTO']
@@ -69,11 +74,12 @@ class EventoAdversoPageView(TemplateView):
         context['sexo'] = n['SEXO']
         context['ID'] = n['ID']
         context['gravidade'] = n['GRAVIDADE']
-        context['evol_vinculada'] = n['EVOLUCAO VINCULADA']
         context['indice_avancar_ea'] = indice_ea + 1
         context['indice_ea'] = indice_ea
         context['indice_retornar_ea'] = indice_ea - 1
         context['ultima_posicao_ea'] = len(ea.loc[::])
+        context['evol_vinculada'] = l['id_evol']
+        
         return context
 
     
