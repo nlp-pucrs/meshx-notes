@@ -97,26 +97,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
     <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-
-    <script>
-        function vincular(){
-
-            $.get( "/vincula?id_ea={{indice_ea}}&id_evol={{indice_evol}}&vincular=True");
-  
-            alert("Vinculado com sucesso, os dados serão atualizados na próxima sessão");
-        }
-        
-        function desvincular(){
-
-            $.get("/vincula?id_ea={{indice_ea}}&id_evol={{indice_evol}}&vincular=False");
-
-            alert("Desvinculado com sucesso, os dados serão atualizados na próxima sessão")
-        }
-
-    </script>
-
 
   </head>
 
@@ -218,15 +198,15 @@
         <hr>
         <div class="row row-evol">
                 <div class="col-md-9 my-column">
-                        <button type="button" class="btn btn-success button" onclick='vincular()'>
+                        <a href="/vincula?id_ea={{indice_ea}}&id_evol={{indice_evol}}&vincular=True"><button type="button" class="btn btn-success button">
                                 Vincular &nbsp;
                                 <i class="fas fa-check"></i>
-                        </button> &nbsp; &nbsp;
+                        </button></a> &nbsp; &nbsp;
                         {% if evol_vinculada  == indice_evol %}
-                        <button type="button" class="btn btn-danger button" onclick='desvincular()'>
+                        <a href="/vincula?id_ea={{indice_ea}}&id_evol={{indice_evol}}&vincular=False"><button type="button" class="btn btn-danger button">
                                 Desvincular &nbsp;
                                 <i class="fas fa-times"></i>
-                        </button>
+                        </button></a>
                         {% endif %}
                         <div class="card my-4">
                                 <h4 class="card-header card-evol">{{ data_evolucao }} | {{ registro_evol }} 
