@@ -85,7 +85,7 @@ class PacientePageView(TemplateView):
 
 		m = prescription.loc[indice] 
 
-		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ');
+		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ')
 
 		#Abrindo o dicionario
 

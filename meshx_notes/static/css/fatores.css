@@ -1,0 +1,76 @@
+  .procedure, .diagnosis, .medication, .anatomy, .other{
+    border-bottom: 2px solid transparent;
+    transition: border 1s linear;
+  }
+
+  .word {
+  cursor: pointer;
+  }
+
+  .procedure{
+    border-bottom-color: black;
+  }
+
+  .diagnosis{
+    border-bottom-color: green;
+  }
+
+  .medication{
+    border-bottom-color: red;
+  }
+
+  .anatomy{
+    border-bottom-color: blue;
+  }
+
+  .other{
+    border-bottom-color: #871F78;
+  }
+
+  .footer {
+    /*position:absolute;*/
+    bottom:-200;
+    width:100%;
+    height:40px;      /* Height of the footer */
+    left: 0px;
+    background:#6cf;
+  }
+
+  .menu {
+    border-left: 1px solid transparent;
+    border-left-color: gray;
+    transition: border 1s linear;
+  }
+
+
+  .foo {
+    float: left;
+    width: 20px;
+    height: 19px;
+    margin: 0px;
+    border: 2px solid rgba(0, 0, 0, 0.336);
+  }
+
+  .black {
+    background: #000000;
+  }
+
+  .green {
+    background: #00661a;
+  }
+
+  .red {
+    background: #cc0404;
+  }
+
+  .blue {
+    background: #0400dbf6;
+  }
+
+  .purple {
+    background: #871F78;
+  }
+
+  .br {
+    line-height: 150%;
+  }
