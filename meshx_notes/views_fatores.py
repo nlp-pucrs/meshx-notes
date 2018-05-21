@@ -71,15 +71,21 @@ class FatoresPageView(TemplateView):
 		evolucao_charespecial = m['DADOS DA EVOLUÇÃO'].split(' ');
 		#texto = evolucao
 		for i in range(len(evolucao_charespecial)):
-			evolucao_charespecial[i] = re.sub(r'(\w)', r'([^\w\s])',r'\1 \2', evolucao_charespecial[i])
-			evolucao_charespecial[i]  = re.sub(r'([^\w\s])', r'(\w)',r'\1 \2', evolucao_charespecial[i])
+			evolucao_charespecial[i] = re.sub(r'(\w)(\W)',r'\1 \2', evolucao_charespecial[i])
+			evolucao_charespecial[i]  = re.sub(r'(\W)(\w)',r'\1 \2', evolucao_charespecial[i])
 
 		#Verifica a lista para ver se a palavra esta no dicionario
 		for i in range(len(evolucao)):
 
+			confere = False
+
 			palavra = evolucao[i]
 			if(palavra != ' ' and palavra != ''):
 				evolucao[i] = '<span onclick="sublinhar(this.id)" class="word" id="'+str(i)+'">'+palavra+'</span>'
+				if(palavra == evolucao_charespecial[i][0:-2] and palavra != evolucao_charespecial[i]):
+					evolucao[i] = evolucao[i]+' '+evolucao_charespecial[i][-1]
+				if(palavra == evolucao_charespecial[i][2:] and palavra != evolucao_charespecial[i]):
+					evolucao[i] = evolucao[i]+' '+evolucao_charespecial[i][0:1]
 			else:
 				evolucao[i] = evolucao_charespecial[i]
 		#Junta tudo novamente

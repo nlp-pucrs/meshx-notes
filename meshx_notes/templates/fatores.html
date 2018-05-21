@@ -93,6 +93,7 @@
                       elemento.className = classe+" word"; 
                       jQuery("#nome").html("Conteudo: "+conteudo);
                       jQuery("#id").html("ID: "+k);
+                      salva_informacoes(k, conteudo, classe)
                   }
                 } 
       }
@@ -102,6 +103,67 @@
 
                 elemento.className = k; 
       }
+
+      function salva_informacoes(ID, nome, classe)
+      {
+            var idElemento = []
+            idElemento[0] =  'diagnosis_';
+            idElemento[1] =  'medication_';
+            idElemento[2] =  'procedure_';
+            idElemento[3] =  'anatomy_';
+            idElemento[4] =  'other_';
+
+            var tipo
+
+            for(var i=0; i<5; i++)
+            {
+                if(classe+"_" == idElemento[i])
+                {
+                  tipo =  idElemento[i];
+                }
+                verifica_vetores(idElemento[i], ID+"-"+nome);
+            }
+            if(document.getElementById(tipo).className != 'aux')
+              document.getElementById(tipo).className = document.getElementById(tipo).className+ID+"-"+nome+"_";
+            else
+              document.getElementById(tipo).className = ID+"-"+nome+"_";
+
+      }
+
+      function verifica_vetores(idElemento, valor){
+        elemento = document.getElementById(idElemento)
+
+        controla = elemento.getAttribute("class")
+
+        var valores = elemento.getAttribute("class")
+
+        if(valores != null)
+        {
+            var vetor = valores.split("_");
+            var cont = 0;
+            var new_vetor = [];
+
+            for(var i=0; i<vetor.length;i++)
+            {              
+              if (vetor[i] != valor)
+              {
+                new_vetor[cont++] = vetor[i]
+                alert("Vetor: "+vetor[i]+"Valor: "+valor)
+              }
+            }
+
+            if(cont!=0)
+            {
+              valores = new_vetor.join();
+              document.getElementById(idElemento).className = valores
+              cont = 0;
+
+              //for(var i=0; i<new_vetor.length;i++)
+                //controla.innerHTML = controla.innerHTML + new_vetor[i] + "<br>";
+
+            }
+        }
+    }
 
 
     </script>
@@ -220,6 +282,11 @@
                             <div class="foo purple"> </div> &nbsp;
                             <span onclick="pega_sublinhado(this.id)" class ="word" id="other"> Outros </span>
                             <span id="auxiliar" class="aux"></span>
+                            <span id="procedure_" class="aux"></span>
+                            <span id="diagnosis_" class="aux"></span>
+                            <span id="medication_" class="aux"></span>
+                            <span id="anatomy_" class="aux"></span>
+                            <span id="other_" class="aux"></span>
                         </a>
                     </li>   
                   </ul>
