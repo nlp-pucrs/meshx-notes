@@ -78,7 +78,10 @@ class EventoAdversoPageView(TemplateView):
         context['indice_ea'] = indice_ea
         context['indice_retornar_ea'] = indice_ea - 1
         context['ultima_posicao_ea'] = len(ea.loc[::])
-        context['evol_vinculada'] = l['id_evol']
+        if not(l['id_ea'] == -1):
+            context['evol_vinculada'] = l['id_evol']
+        else:
+            context['evol_vinculada'] = -1
         
         return context
 
