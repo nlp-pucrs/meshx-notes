@@ -2,7 +2,11 @@
   <head></head>
 
   <body>
-    <h1>Validando dados... </h1>
-    <meta http-equiv="refresh" content="0;URL=/ea/?id_ea={{id_ea}}&id_evol={{id_evol}}">
+    <h1>Já existe uma evolução vinculada com esse evento adverso</h1>
+    <h1>Atualmente: <br>
+        Evento Adverso: {{ id_ea }} &nbsp; &nbsp; Evolução vinculada: {{ evol_vinculada }}</h1>
+    <br><br>
+    <h1> Você retornará para a página em 5s</h1>
+    <meta http-equiv="refresh" content="{{ tempo }};URL=/ea/?id_ea={{id_ea}}&id_evol={{id_evol}}">
   </body>
 </html> 

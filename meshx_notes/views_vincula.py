@@ -23,10 +23,18 @@ class VinculaPageView(TemplateView):
         vincular = self.request.GET.get('vincular')
 
         if(vincular == 'True'):
-            vincula.loc[id_ea] = [id_ea, id_evol, None, None]
-            teste = "if"
+            if(id_ea in vincula.id_ea.values):
+                linha = vincula[(vincula['id_ea'] == id_ea)]
+                valor_linha = linha['id_evol'].values
+                context['evol_vinculada'] = valor_linha.item(0)
+                context['tempo'] = 5
+            else:
+                vincula.loc[id_evol, 'id_ea'] = id_ea
+                vincula.loc[id_evol, 'id_evol'] = id_evol
+                context['tempo'] = 0
         else:
-            vincula.loc[id_ea] = [-1, id_evol, None, None]
+            vincula.loc[id_evol, 'id_ea'] = -1
+            context['tempo'] = 0
 
         vincula.to_csv(caminho_vincula, index=None)
 

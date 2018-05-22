@@ -167,14 +167,14 @@
                                 Vincular &nbsp;
                                 <i class="fas fa-check"></i>
                         </button></a> &nbsp; &nbsp;
-                        {% if evol_vinculada  == indice_evol %}
+                        {% if evol_vinculada == indice_evol %}
                         <a href="/vincula?id_ea={{indice_ea}}&id_evol={{indice_evol}}&vincular=False"><button type="button" class="btn btn-danger button">
                                 Desvincular &nbsp;
                                 <i class="fas fa-times"></i>
                         </button></a>
                         {% endif %}
                         <div class="card my-4">
-                                <h4 class="card-header card-evol">{{ data_evolucao }} | {{ registro_evol }} 
+                                <h4 class="card-header card-evol">{{ data_evolucao }} | {{ registro_evol }} - {{ indice_evol }}
                                     {% if indice_avancar_evol != ultima_posicao_evol and registro_evol == registro_ea %}
                                         <a href="?id_evol={{indice_avancar_evol}}&id_ea={{indice_ea}}"><i class="fas fa-caret-square-right butt-evol"></i></a>
                                     {% endif %} 
@@ -190,14 +190,7 @@
                         <div class="card car-ea">
                                 <h5 class="card-header"> Evolução  <button type="button" class="btn btn-dark btn-sm">Enviar</button> </h5>
                                 <div class="card-body">
-                                        <div class="custom-control custom-checkbox">  
-                                                <input type="checkbox" class="custom-control-input" id="customChecks1">  
-                                                <label class="custom-control-label" for="customChecks1">Check this</label>  
-                                        </div>
-                                        <div class="custom-control custom-checkbox">  
-                                            <input type="checkbox" class="custom-control-input" id="customChecks2">  
-                                            <label class="custom-control-label" for="customChecks2">Check this</label>  
-                                        </div>      
+    
                                 </div>
                         </div>
                 </div>

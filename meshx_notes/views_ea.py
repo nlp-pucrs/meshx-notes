@@ -28,12 +28,12 @@ class EventoAdversoPageView(TemplateView):
         indice_ea = 0
         indice_evolucao = 0
 
-        if self.request.GET.get('id_ea') == None or (0 > indice_ea) or (indice_ea >= (len(ea.loc[::]))):
+        if any((self.request.GET.get('id_ea') == None, (0 > indice_ea), (indice_ea >= (len(ea.loc[::]))))):
             indice_ea = 0
         else:
             indice_ea = int(self.request.GET.get('id_ea'))
 
-        if self.request.GET.get('id_evol') == None or (0 > indice_evolucao) or (indice_evolucao >= (len(evolucao.loc[::]))):
+        if any((self.request.GET.get('id_evol') == None, (0 > indice_evolucao), (indice_evolucao >= (len(evolucao.loc[::]))))):
             if(indice_ea == 0):
                 indice_evolucao = 0
                 context['ultima_posicao_evol'] = 16
@@ -51,11 +51,16 @@ class EventoAdversoPageView(TemplateView):
                 indice_evolucao = int(self.request.GET.get('id_evol'))
                 context['ultima_posicao_evol'] = len(evolucao.loc[::])
                 context['primeira_posicao_evol'] = 15
-        
 
-        l = vincula.loc[indice_ea]
         m = evolucao.loc[indice_evolucao]
         n = ea.loc[indice_ea]
+        if(indice_ea in vincula.id_ea.values):
+            vinculado = True
+            linha = vincula[(vincula['id_ea'] == indice_ea)]
+            valor_linha = linha['id_evol'].values
+            context['evol_vinculada'] = valor_linha.item(0)
+        else: 
+            context['evol_vinculada'] = None
     
         # Context da Evolução
         context['data_evolucao'] = m['DATA EVOL'] 
@@ -77,11 +82,7 @@ class EventoAdversoPageView(TemplateView):
         context['indice_avancar_ea'] = indice_ea + 1
         context['indice_ea'] = indice_ea
         context['indice_retornar_ea'] = indice_ea - 1
-        context['ultima_posicao_ea'] = len(ea.loc[::])
-        if not(l['id_ea'] == -1):
-            context['evol_vinculada'] = l['id_evol']
-        else:
-            context['evol_vinculada'] = -1
+        context['ultima_posicao_ea'] = len(ea.loc[::])      
         
         return context
 
