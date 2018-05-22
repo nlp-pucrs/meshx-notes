@@ -87,13 +87,12 @@
 
                 if(elemento.className.indexOf(classe) != -1){
                       elemento.className = "word"; 
+                      salva_informacoes(k, conteudo, classe, 'exclui')
                   }   
                 else{
                   if ( document.getElementById('auxiliar').getAttribute("class") != 'aux' ){
                       elemento.className = classe+" word"; 
-                      jQuery("#nome").html("Conteudo: "+conteudo);
-                      jQuery("#id").html("ID: "+k);
-                      salva_informacoes(k, conteudo, classe)
+                      salva_informacoes(k, conteudo, classe, '')
                   }
                 } 
       }
@@ -104,7 +103,8 @@
                 elemento.className = k; 
       }
 
-      function salva_informacoes(ID, nome, classe)
+
+       function salva_informacoes(ID, nome, classe, acao)
       {
             var idElemento = []
             idElemento[0] =  'diagnosis_';
@@ -121,45 +121,116 @@
                 {
                   tipo =  idElemento[i];
                 }
-                verifica_vetores(idElemento[i], ID+"-"+nome);
+                verifica_vetores(idElemento[i], ID+"-"+nome, '');
             }
+            //Se tiver algo nele, entao adiciona o novo com o que ja tinha
             if(document.getElementById(tipo).className != 'aux')
               document.getElementById(tipo).className = document.getElementById(tipo).className+ID+"-"+nome+"_";
             else
+              //Se nao tiver nada, entao adiciona um novo
               document.getElementById(tipo).className = ID+"-"+nome+"_";
+
+            for(var i=0; i<5; i++)
+              {
+                  verifica_vetores(idElemento[i], '_', 'pega_dados');
+              }
+
+            if(acao == 'exclui')
+              for(var i=0; i<5; i++)
+              {
+                  verifica_vetores(idElemento[i], ID+"-"+nome, '');
+              }
 
       }
 
-      function verifica_vetores(idElemento, valor){
-        elemento = document.getElementById(idElemento)
-
-        controla = elemento.getAttribute("class")
+      function verifica_vetores(idElemento, valor, acao){
+        var elemento = document.getElementById(idElemento)
 
         var valores = elemento.getAttribute("class")
 
         if(valores != null)
         {
-            var vetor = valores.split("_");
+            var vetor = valores.split('_');
             var cont = 0;
             var new_vetor = [];
+            var dados = [];
+            var ID = 0, INFORMACAO = 1;
 
             for(var i=0; i<vetor.length;i++)
             {              
-              if (vetor[i] != valor)
+              if (vetor[i] != valor && valores != 'aux')
               {
                 new_vetor[cont++] = vetor[i]
-                alert("Vetor: "+vetor[i]+"Valor: "+valor)
               }
             }
 
-            if(cont!=0)
+            if(cont>=0 && valores != 'aux')
             {
-              valores = new_vetor.join();
+              valores = new_vetor.join('_');
               document.getElementById(idElemento).className = valores
               cont = 0;
 
-              //for(var i=0; i<new_vetor.length;i++)
-                //controla.innerHTML = controla.innerHTML + new_vetor[i] + "<br>";
+              if(idElemento == 'procedure_'){
+
+                if(acao == 'pega_dados')
+                  for(var i=0; i<(new_vetor.length-1);i++)
+                  {              
+                    dados = new_vetor[i].split('-')
+                    //alert(dados[ID]+"---"+dados[INFORMACAO])
+                  }
+
+                valores = '<br/>'+new_vetor.join('<br/>');
+                jQuery("#escreve_procedure").html("<strong>Procedimentos:</strong> "+valores);
+              }
+              if(idElemento == 'diagnosis_'){
+
+                if(acao == 'pega_dados')
+                  for(var i=0; i<(new_vetor.length-1);i++)
+                  {              
+                    dados = new_vetor[i].split('-')
+                    //alert(dados[ID]+"---"+dados[INFORMACAO])
+                  }
+
+                valores = '<br/>'+new_vetor.join('<br/>');
+                jQuery("#escreve_diagnosis").html("<strong>Diagnóstico:</strong> "+valores);
+              }
+              if(idElemento == 'medication_'){
+
+                if(acao == 'pega_dados')
+                  for(var i=0; i<(new_vetor.length-1);i++)
+                  {              
+                    dados = new_vetor[i].split('-')
+                    //alert(dados[ID]+"---"+dados[INFORMACAO])
+                  }
+
+                valores = '<br/>'+new_vetor.join('<br/>');
+                jQuery("#escreve_medication").html("<strong>Medicação:</strong> "+valores);
+              }
+              if(idElemento == 'anatomy_'){
+
+              if(acao == 'pega_dados')
+                for(var i=0; i<(new_vetor.length-1);i++)
+                {              
+                  dados = new_vetor[i].split('-')
+                  //alert(dados[ID]+"---"+dados[INFORMACAO])
+                }
+
+                valores = '<br/>'+new_vetor.join('<br/>');
+                jQuery("#escreve_anatomy").html("<strong>Anatomia:</strong> "+valores);
+              }
+              if(idElemento == 'other_'){
+
+                if(acao == 'pega_dados')
+                  for(var i=0; i<(new_vetor.length-1);i++)
+                  {              
+                    dados = new_vetor[i].split('-')
+                    //alert(dados[ID]+"---"+dados[INFORMACAO])
+                  }
+
+                for(var i=0; i<(new_vetor.length-1);i++)
+                valores = '<br/>'+new_vetor.join('<br/>');
+                jQuery("#escreve_other").html("<strong>Outros:</strong> "+valores);
+              }
 
             }
         }
@@ -299,10 +370,12 @@
                 Definição 
               </h5>
               <div class="card-body">
+                <div id="escreve_procedure" class="aux"><strong>Procedimentos:</strong></div>
+                <div id="escreve_diagnosis" class="aux"><strong>Diagnóstico:</strong></div>
+                <div id="escreve_medication" class="aux"><strong>Medicação:</strong></div>
+                <div id="escreve_anatomy" class="aux"><strong>Anatomia:</strong></div>
+                <div id="escreve_other" class="aux"><strong>Outros:</strong></div>
                 <div id="nome"></div>
-
-                <div id="id"></div>
-                <div id="informacoes"></div>
                 <br/>
                 <!--<form name="valida" action="../valida" method="GET">-->
                     <input type="hidden" name="id" value="{{ indice }}"/> 
