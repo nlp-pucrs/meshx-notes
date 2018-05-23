@@ -4,31 +4,24 @@
     border-bottom: 2px solid transparent;
     transition: border 1s linear;
   }
-
   .word {
   cursor: pointer;
   }
-
   .procedure{
     border-bottom-color: black;
   }
-
   .diagnosis{
     border-bottom-color: green;
   }
-
   .medication{
     border-bottom-color: red;
   }
-
   .anatomy{
     border-bottom-color: blue;
   }
-
   .other{
     border-bottom-color: #871F78;
   }
-
   .footer {
     /*position:absolute;*/
     bottom:-200;
@@ -37,14 +30,11 @@
     left: 0px;
     background:#6cf;
   }
-
   .menu {
     border-left: 1px solid transparent;
     border-left-color: gray;
     transition: border 1s linear;
   }
-
-
   .foo {
     float: left;
     width: 20px;
@@ -52,27 +42,21 @@
     margin: 0px;
     border: 2px solid rgba(0, 0, 0, 0.336);
   }
-
   .black {
     background: #000000;
   }
-
   .green {
     background: #00661a;
   }
-
   .red {
     background: #cc0404;
   }
-
   .blue {
     background: #0400dbf6;
   }
-
   .purple {
     background: #871F78;
   }
-
   .br {
     line-height: 150%;
   }
@@ -84,7 +68,6 @@
                 var elemento = document.getElementById(k); 
                 var conteudo = $('#'+k).text();  
                 var classe =  document.getElementById('auxiliar').getAttribute("class");
-
                 if(elemento.className.indexOf(classe) != -1){
                       elemento.className = "word"; 
                       salva_informacoes(k, conteudo, classe, 'exclui')
@@ -96,14 +79,10 @@
                   }
                 } 
       }
-
       function pega_sublinhado(k){
                 var elemento = document.getElementById('auxiliar');  
-
                 elemento.className = k; 
       }
-
-
        function salva_informacoes(ID, nome, classe, acao)
       {
             var idElemento = []
@@ -112,131 +91,69 @@
             idElemento[2] =  'procedure_';
             idElemento[3] =  'anatomy_';
             idElemento[4] =  'other_';
-
             var tipo
-
             for(var i=0; i<5; i++)
             {
                 if(classe+"_" == idElemento[i])
                 {
                   tipo =  idElemento[i];
                 }
-                verifica_vetores(idElemento[i], ID+"-"+nome, '');
+                verifica_vetores(idElemento[i], ID, nome, '');
             }
             //Se tiver algo nele, entao adiciona o novo com o que ja tinha
-            if(document.getElementById(tipo).className != 'aux')
-              document.getElementById(tipo).className = document.getElementById(tipo).className+ID+"-"+nome+"_";
-            else
+            if(document.getElementById(tipo+"informacao").value != 'aux')
+            {    
+              document.getElementById(tipo+"id").value = document.getElementById(tipo+"id").value+ID+" "
+              document.getElementById(tipo+"informacao").value = document.getElementById(tipo+"informacao").value+nome+" "
+            }
+            else{
               //Se nao tiver nada, entao adiciona um novo
-              document.getElementById(tipo).className = ID+"-"+nome+"_";
-
+              document.getElementById(tipo+"id").value = ID+" "
+              document.getElementById(tipo+"informacao").value = nome+" "
+            }
             for(var i=0; i<5; i++)
               {
-                  verifica_vetores(idElemento[i], '_', 'pega_dados');
+                  verifica_vetores(idElemento[i], '_', '_', 'pega_dados');
               }
-
             if(acao == 'exclui')
               for(var i=0; i<5; i++)
               {
-                  verifica_vetores(idElemento[i], ID+"-"+nome, '');
+                  verifica_vetores(idElemento[i], ID, nome, '');
               }
-
       }
+      function verifica_vetores(idElemento, ID, nome, acao){
+        var valoresID = document.getElementById(idElemento+"id").value;
+        var valoresInformacao = document.getElementById(idElemento+"informacao").value; 
 
-      function verifica_vetores(idElemento, valor, acao){
-        var elemento = document.getElementById(idElemento)
-
-        var valores = elemento.getAttribute("class")
-
-        if(valores != null)
+        if(valoresID != null)
         {
-            var vetor = valores.split('_');
+            var vetorID = valoresID.split(' ');
+            var vetorInformacao = valoresInformacao.split(' ');
             var cont = 0;
-            var new_vetor = [];
-            var dados = [];
-            var ID = 0, INFORMACAO = 1;
-
-            for(var i=0; i<vetor.length;i++)
+            var new_vetorID = [];
+            var new_vetorInformacao = [];
+            var dadosID = [];
+            var dadosInformacoes = [];
+            for(var i=0; i<vetorID.length;i++)
             {              
-              if (vetor[i] != valor && valores != 'aux')
+              if (vetorID[i] != ID && valoresInformacao != 'aux')
               {
-                new_vetor[cont++] = vetor[i]
+                new_vetorID[cont] = vetorID[i]
+                new_vetorInformacao[cont] = vetorInformacao[i]
+                cont++
               }
             }
-
-            if(cont>=0 && valores != 'aux')
+            if(cont>=0 && valoresInformacao != 'aux')
             {
-              valores = new_vetor.join('_');
-              document.getElementById(idElemento).className = valores
+              valoresID = new_vetorID.join(' ');
+              valoresInformacao = new_vetorInformacao.join(' ');
+
+              document.getElementById(idElemento+"id").value = valoresID
+              document.getElementById(idElemento+"informacao").value = valoresInformacao
               cont = 0;
-
-              if(idElemento == 'procedure_'){
-
-                if(acao == 'pega_dados')
-                  for(var i=0; i<(new_vetor.length-1);i++)
-                  {              
-                    dados = new_vetor[i].split('-')
-                    //alert(dados[ID]+"---"+dados[INFORMACAO])
-                  }
-
-                valores = '<br/>'+new_vetor.join('<br/>');
-                jQuery("#escreve_procedure").html("<strong>Procedimentos:</strong> "+valores);
-              }
-              if(idElemento == 'diagnosis_'){
-
-                if(acao == 'pega_dados')
-                  for(var i=0; i<(new_vetor.length-1);i++)
-                  {              
-                    dados = new_vetor[i].split('-')
-                    //alert(dados[ID]+"---"+dados[INFORMACAO])
-                  }
-
-                valores = '<br/>'+new_vetor.join('<br/>');
-                jQuery("#escreve_diagnosis").html("<strong>Diagnóstico:</strong> "+valores);
-              }
-              if(idElemento == 'medication_'){
-
-                if(acao == 'pega_dados')
-                  for(var i=0; i<(new_vetor.length-1);i++)
-                  {              
-                    dados = new_vetor[i].split('-')
-                    //alert(dados[ID]+"---"+dados[INFORMACAO])
-                  }
-
-                valores = '<br/>'+new_vetor.join('<br/>');
-                jQuery("#escreve_medication").html("<strong>Medicação:</strong> "+valores);
-              }
-              if(idElemento == 'anatomy_'){
-
-              if(acao == 'pega_dados')
-                for(var i=0; i<(new_vetor.length-1);i++)
-                {              
-                  dados = new_vetor[i].split('-')
-                  //alert(dados[ID]+"---"+dados[INFORMACAO])
-                }
-
-                valores = '<br/>'+new_vetor.join('<br/>');
-                jQuery("#escreve_anatomy").html("<strong>Anatomia:</strong> "+valores);
-              }
-              if(idElemento == 'other_'){
-
-                if(acao == 'pega_dados')
-                  for(var i=0; i<(new_vetor.length-1);i++)
-                  {              
-                    dados = new_vetor[i].split('-')
-                    //alert(dados[ID]+"---"+dados[INFORMACAO])
-                  }
-
-                for(var i=0; i<(new_vetor.length-1);i++)
-                valores = '<br/>'+new_vetor.join('<br/>');
-                jQuery("#escreve_other").html("<strong>Outros:</strong> "+valores);
-              }
-
             }
         }
     }
-
-
     </script>
 
     <meta charset="utf-8">
@@ -353,11 +270,21 @@
                             <div class="foo purple"> </div> &nbsp;
                             <span onclick="pega_sublinhado(this.id)" class ="word" id="other"> Outros </span>
                             <span id="auxiliar" class="aux"></span>
-                            <span id="procedure_" class="aux"></span>
-                            <span id="diagnosis_" class="aux"></span>
-                            <span id="medication_" class="aux"></span>
-                            <span id="anatomy_" class="aux"></span>
-                            <span id="other_" class="aux"></span>
+
+                            <input id="procedure_id" type="hidden" name="procedure_id" value="aux"/> 
+                            <input id="procedure_informacao" type="hidden" name="procedure_informacao" value="aux"/> 
+
+                            <input id="diagnosis_id" type="hidden" name="diagnosis_id" value="aux"/> 
+                            <input id="diagnosis_informacao" type="hidden" name="diagnosis_informacao" value="aux"/> 
+
+                            <input id="medication_id" type="hidden" name="medication_id" value="aux"/> 
+                            <input id="medication_informacao" type="hidden" name="medication_informacao" value="aux"/> 
+
+                            <input id="anatomy_id" type="hidden" name="anatomy_id" value="aux"/> 
+                            <input id="anatomy_informacao" type="hidden" name="anatomy_informacao" value="aux"/> 
+
+                            <input id="other_id" type="hidden" name="other_id" value="aux"/> 
+                            <input id="other_informacao" type="hidden" name="other_informacao" value="aux"/>
                         </a>
                     </li>   
                   </ul>
@@ -370,17 +297,6 @@
                 Definição 
               </h5>
               <div class="card-body">
-                <div id="escreve_procedure" class="aux"><strong>Procedimentos:</strong></div>
-                <div id="escreve_diagnosis" class="aux"><strong>Diagnóstico:</strong></div>
-                <div id="escreve_medication" class="aux"><strong>Medicação:</strong></div>
-                <div id="escreve_anatomy" class="aux"><strong>Anatomia:</strong></div>
-                <div id="escreve_other" class="aux"><strong>Outros:</strong></div>
-                <div id="nome"></div>
-                <br/>
-                <!--<form name="valida" action="../valida" method="GET">-->
-                    <input type="hidden" name="id" value="{{ indice }}"/> 
-                    <input type="hidden" name="l" value="{{ lingua }}"/> 
-               <!-- </form>-->
               </div>
           <div/>
         </div>
