@@ -1,12 +1,19 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import TemplateView
+from gensim.models import KeyedVectors
+import unicodedata
 import os
+import re
 import pandas as pd 
 
 class EventoAdversoPageView(TemplateView):
 
     template_name = 'header.html'
+
+    def remove_accents(self, input_str):
+	    nfkd_form = unicodedata.normalize('NFKD', input_str)
+	    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
     def get_context_data(self, **kwargs):
         context = super(EventoAdversoPageView, self).get_context_data(**kwargs)
@@ -61,11 +68,40 @@ class EventoAdversoPageView(TemplateView):
             context['evol_vinculada'] = valor_linha.item(0)
         else: 
             context['evol_vinculada'] = None
+
+
+        nfkd_form = unicodedata.normalize('NFKD', m['DADOS DA EVOLUÇÃO'])
+        aux = u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+        texto = re.sub('[^\w\s]','', aux)
+        evolucao = texto.split(' ');
+        evolucao_charespecial = m['DADOS DA EVOLUÇÃO'].split(' ');
+
+        for i in range(len(evolucao_charespecial)):
+            evolucao_charespecial[i] = re.sub(r'(\w)(\W)',r'\1 \2', evolucao_charespecial[i])
+            evolucao_charespecial[i]  = re.sub(r'(\W)(\w)',r'\1 \2', evolucao_charespecial[i])
+
+        for i in range(len(evolucao)):
+
+            confere = False
+
+            palavra = evolucao[i]
+            if(palavra != ' ' and palavra != ''):
+                evolucao[i] = '<span onclick="sublinhar(this.id)" class="word" id="'+str(i)+'">'+palavra+'</span>'
+                if(palavra == evolucao_charespecial[i][0:-2] and palavra != evolucao_charespecial[i]):
+                	evolucao[i] = evolucao[i]+' '+evolucao_charespecial[i][-1]
+                if(palavra == evolucao_charespecial[i][2:] and palavra != evolucao_charespecial[i]):
+                    evolucao[i] = evolucao[i]+' '+evolucao_charespecial[i][0:1]
+            else:
+                evolucao[i] = evolucao_charespecial[i]
+
+		#Junta tudo novamente
+        strr = ' '.join(evolucao)
     
         # Context da Evolução
         context['data_evolucao'] = m['DATA EVOL'] 
         context['registro_evol'] = m['REG. PACIENTE']
-        context['evolucao'] = m['DADOS DA EVOLUÇÃO']
+        context['evolucao'] = strr
         context['indice_avancar_evol'] = indice_evolucao + 1
         context['indice_evol'] = indice_evolucao
         context['indice_retornar_evol'] = indice_evolucao - 1   
