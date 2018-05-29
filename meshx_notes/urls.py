@@ -20,7 +20,6 @@ from .views_mesh import PacientePageView
 from .views_ea import EventoAdversoPageView
 from .views_valida import ValidaPageView
 from .views_vincula import VinculaPageView
-from .views_fatores import FatoresPageView
 
 urlpatterns = [
     url(r'^$', PacientePageView.as_view(), name='index'),
@@ -28,6 +27,5 @@ urlpatterns = [
     path('ea/', EventoAdversoPageView.as_view(), name='home'),
     path('vincula/', VinculaPageView.as_view(), name='vincula'), 
     path('meshx/', PacientePageView.as_view(), name='index'),
-    path('valida/', ValidaPageView.as_view(), name='valida'),
-    path('fatores/', FatoresPageView.as_view(), name='fatores')
+    path('valida/', ValidaPageView.as_view(), name='valida')
 ]
