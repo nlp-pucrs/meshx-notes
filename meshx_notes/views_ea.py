@@ -62,7 +62,6 @@ class EventoAdversoPageView(TemplateView):
         m = evolucao.loc[indice_evolucao]
         n = ea.loc[indice_ea]
         if(indice_ea in vincula.id_ea.values):
-            vinculado = True
             linha = vincula[(vincula['id_ea'] == indice_ea)]
             valor_linha = linha['id_evol'].values
             context['evol_vinculada'] = valor_linha.item(0)

@@ -1,12 +1,31 @@
 <html lang="en">
 <style>
-    .footer {
-        position:absolute;
-        bottom:-620px;
+    * {
+        box-sizing: border-box;
+    }
+    *:before,
+    *:after {
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        height: 100%;
+        position: relative;
+    }
+    .my-container {
+        min-height: 100vh; /* will cover the 100% of viewport */
         width:100%;
-        height:40px;      /* Height of the footer */
-        left: 0px;
-        background:#6cf;
+        min-width:1100px;
+        overflow: hidden;
+        display: block;
+        position: relative;
+        padding-bottom: 100px; /* height of your footer */
+    }
+    footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        margin:0; padding:0;
     }
 
     .menu {
@@ -21,12 +40,6 @@
         height: 19px;
         margin: 0px;
         border: 2px solid rgba(0, 0, 0, 0.336); 
-    }
-
-    .my-container{
-       max-width: 1000px;
-       width: 500px;
-       height: 923px 
     }
 
     .column-check-evol{
@@ -150,23 +163,23 @@
     }
 
     .risco{
-        border-bottom-color: purple;
+        border-bottom-color: brown;
     }
 
     .local{
-        border-bottom-color: brown
-    }
-
-    .setor{
         border-bottom-color: chartreuse
     }
 
-    .unidade{
+    .setor{
         border-bottom-color: cornflowerblue
     }
 
-    .desencadeante{
+    .unidade{
         border-bottom-color: darkslategrey
+    }
+
+    .desencadeante{
+        border-bottom-color: purple
     }
 </style>
   <head>
@@ -185,101 +198,137 @@
 
     <script type="text/javascript">
         function sublinhar(k){
-                  var elemento = document.getElementById(k); 
-                  var conteudo = $('#'+k).text();  
-                  var classe =  document.getElementById('auxiliar').getAttribute("class");
-                  if(elemento.className.indexOf(classe) != -1){
-                        elemento.className = "word"; 
-                        salva_informacoes(k, conteudo, classe, 'exclui')
-                    }   
-                  else{
-                    if ( document.getElementById('auxiliar').getAttribute("class") != 'aux' ){
-                        elemento.className = classe+" word"; 
-                        salva_informacoes(k, conteudo, classe, '')
-                    }
-                  } 
+            var elemento = document.getElementById(k); 
+            var conteudo = $('#'+k).text();  
+            var classe =  document.getElementById('auxiliar').getAttribute("class");
+            if(elemento.className.indexOf(classe) != -1){
+                elemento.className = "word"; 
+                salva_informacoes(k, conteudo, classe, 'exclui')
+            }   
+            else{
+                if ( document.getElementById('auxiliar').getAttribute("class") != 'aux' ){
+                    elemento.className = classe+" word"; 
+                    salva_informacoes(k, conteudo, classe, '')
+                }
+            } 
         }
+
         function pega_sublinhado(k){
-                  var elemento = document.getElementById('auxiliar');  
-                  elemento.className = k; 
+            var elemento = document.getElementById('auxiliar');  
+            elemento.className = k; 
         }
-         function salva_informacoes(ID, nome, classe, acao)
-        {
-              var idElemento = []
-              idElemento[0] =  'dano_';
-              idElemento[1] =  'avaliacao_';
-              idElemento[2] =  'procedimento_';
-              idElemento[3] =  'condicoes_';
-              idElemento[4] =  'risco_';
-              idElemento[5] =  'local_';
-              idElemento[6] =  'setor_';
-              idElemento[7] =  'unidade_';
-              idElemento[8] =  'desencadeante_';
-              var tipo
-              for(var i=0; i<9; i++)
-              {
-                  if(classe+"_" == idElemento[i])
-                  {
-                    tipo =  idElemento[i];
-                  }
+
+        function salva_informacoes(ID, nome, classe, acao){
+            var idElemento = []
+            idElemento[0] =  'dano_';
+            idElemento[1] =  'avaliacao_';
+            idElemento[2] =  'procedimento_';
+            idElemento[3] =  'condicoes_';
+            idElemento[4] =  'risco_';
+            idElemento[5] =  'local_';
+            idElemento[6] =  'setor_';
+            idElemento[7] =  'unidade_';
+            idElemento[8] =  'desencadeante_';
+            var tipo
+            for(var i=0; i<9; i++){
+                if(classe+"_" == idElemento[i]){
+                  tipo =  idElemento[i];
+                }
+                verifica_vetores(idElemento[i], ID, nome, '');
+            }
+            //Se tiver algo nele, entao adiciona o novo com o que ja tinha
+            if(document.getElementById(tipo+"informacao").value != 'aux'){    
+              document.getElementById(tipo+"id").value = document.getElementById(tipo+"id").value+ID+" ";
+              document.getElementById(tipo+"informacao").value = document.getElementById(tipo+"informacao").value+nome+" ";
+            }
+            else{
+              //Se nao tiver nada, entao adiciona um novo
+              document.getElementById(tipo+"id").value = ID+" ";
+              document.getElementById(tipo+"informacao").value = nome+" ";
+            }
+
+            for(var i=0; i<9; i++){
+                verifica_vetores(idElemento[i], '_', '_', 'pega_dados');
+            }
+            
+            if(acao == 'exclui'){
+                for(var i=0; i<9; i++){
                   verifica_vetores(idElemento[i], ID, nome, '');
-              }
-              //Se tiver algo nele, entao adiciona o novo com o que ja tinha
-              if(document.getElementById(tipo+"informacao").value != 'aux')
-              {    
-                document.getElementById(tipo+"id").value = document.getElementById(tipo+"id").value+ID+" "
-                document.getElementById(tipo+"informacao").value = document.getElementById(tipo+"informacao").value+nome+" "
-              }
-              else{
-                //Se nao tiver nada, entao adiciona um novo
-                document.getElementById(tipo+"id").value = ID+" "
-                document.getElementById(tipo+"informacao").value = nome+" "
-              }
-              for(var i=0; i<9; i++)
-                {
-                    verifica_vetores(idElemento[i], '_', '_', 'pega_dados');
                 }
-              if(acao == 'exclui')
-                for(var i=0; i<9; i++)
-                {
-                    verifica_vetores(idElemento[i], ID, nome, '');
-                }
+            }    
         }
+
         function verifica_vetores(idElemento, ID, nome, acao){
-          var valoresID = document.getElementById(idElemento+"id").value;
-          var valoresInformacao = document.getElementById(idElemento+"informacao").value; 
+            var valoresID = document.getElementById(idElemento+"id").value;
+            var valoresInformacao = document.getElementById(idElemento+"informacao").value; 
   
-          if(valoresID != null)
-          {
-              var vetorID = valoresID.split(' ');
-              var vetorInformacao = valoresInformacao.split(' ');
-              var cont = 0;
-              var new_vetorID = [];
-              var new_vetorInformacao = [];
-              var dadosID = [];
-              var dadosInformacoes = [];
-              for(var i=0; i<vetorID.length;i++)
-              {              
-                if (vetorID[i] != ID && valoresInformacao != 'aux')
-                {
-                  new_vetorID[cont] = vetorID[i]
-                  new_vetorInformacao[cont] = vetorInformacao[i]
-                  cont++
+            if(valoresID != null){
+                var vetorID = valoresID.split(' ');
+                var vetorInformacao = valoresInformacao.split(' ');
+                var cont = 0;
+                var new_vetorID = [];
+                var new_vetorInformacao = [];
+                var dadosID = [];
+                var dadosInformacoes = [];
+
+                for(var i=0; i<vetorID.length;i++){              
+                  if (vetorID[i] != ID && valoresInformacao != 'aux'){
+                    new_vetorID[cont] = vetorID[i];
+                    new_vetorInformacao[cont] = vetorInformacao[i];
+                    cont++;
+                  }
                 }
-              }
-              if(cont>=0 && valoresInformacao != 'aux')
-              {
-                valoresID = new_vetorID.join(' ');
-                valoresInformacao = new_vetorInformacao.join(' ');
-  
-                document.getElementById(idElemento+"id").value = valoresID
-                document.getElementById(idElemento+"informacao").value = valoresInformacao
-                cont = 0;
-              }
-          }
-      }
-      </script>
-  </head>
+
+                if(cont>=0 && valoresInformacao != 'aux'){
+                    valoresID = new_vetorID.join(' ');
+                    valoresInformacao = new_vetorInformacao.join(' ');
+                       
+                    document.getElementById(idElemento+"id").value = valoresID;
+                    document.getElementById(idElemento+"informacao").value = valoresInformacao;
+                    cont = 0;
+                }
+            }
+        }
+
+        // function para_csv(){
+        //     var dano_id = document.getElementById("dano_id").value
+        //     var dano_informacoes = document.getElementById("dano_informacao").value
+            
+        //     var avaliacao_id = document.getElementById("avaliacao_id").value
+        //     var avaliacao_informacoes = document.getElementById("avaliacao_informacao").value
+            
+        //     var condicoes_id = document.getElementById("condicoes_id").value
+        //     var condicoes_informacoes = document.getElementById("condicoes_informacao").value
+
+        //     var risco_id = document.getElementById("risco_id").value
+        //     var risco_informacoes = document.getElementById("risco_informacao").value
+
+        //     var local_id = document.getElementById("local_id").value
+        //     var local_informacoes = document.getElementById("local_informacao").value
+
+        //     var setor_id = document.getElementById("setor_id").value
+        //     var setor_informacoes = document.getElementById("setor_informacao").value
+
+        //     var unidade_id = document.getElementById("unidade_id").value
+        //     var unidade_informacoes = document.getElementById("unidade_informacao").value
+
+        //     var desencadeante_id = document.getElementById("desencadeante_id").value
+        //     var desencadeante_informacoes = document.getElementById("desencadeante_informacao").value
+
+        //     $.get( "/fatores?dano_id="+dano_id+"&dano_informacoes="+dano_informacoes
+        //                     +"&avaliacao_id="+avaliacao_id+"&avaliacao_informacoes="+avaliacao_informacoes
+        //                     +"&condicoes_id="+condicoes_id+"&condicoes_informacoes="+condicoes_informacoes
+        //                     +"&risco_id="+risco_id+"&risco_informacoes="+risco_informacoes
+        //                     +"&local_id="+local_id+"&local_informacoes="+local_informacoes
+        //                     +"&setor_id="+setor_id+"&setor_informacoes="+setor_informacoes
+        //                     +"&unidade_id="+unidade_id+"&unidade_informacoes="+unidade_informacoes
+        //                     +"&desencadeante_id="+desencadeante_id+"&desencadeante_informacoes="+desencadeante_informacoes
+        //         );
+
+        //     alert("Enviado com sucesso");
+        // } 
+    </script>
+</head>
 
   <body>
     <!-- Navigation -->
@@ -343,7 +392,7 @@
         </div>
         <hr>
         <div class="row row-evol">
-                <div class="col-md-9 my-column">
+                <div class="col-md-8 my-column">
                         <a href="/vincula?id_ea={{indice_ea}}&id_evol={{indice_evol}}&vincular=True"><button type="button" class="btn btn-success button">
                                 Vincular &nbsp;
                                 <i class="fas fa-check"></i>
@@ -367,9 +416,9 @@
                                 <div class="card-body"> {{ evolucao |safe}} </div>  
                         </div>    
                 </div>
-                <div class="col-md-3 column-check-evol">
+                <div class="col-md-4 column-check-evol">
                         <div class="card car-ea">
-                                <h5 class="card-header"> Fatores de Queda  </h5>
+                                <h4 class="card-header">Fatores de Queda </h4>
                                 <div class="card-body">
                                         <ul class="list-unstyled mb-0">
                                             <li>
@@ -425,33 +474,40 @@
                                                     <div class="foo purple"> </div> &nbsp;
                                                     <span onclick="pega_sublinhado(this.id)" class ="word" id="desencadeante">Fator desencadeante da queda. </span>
                                                     <span id="auxiliar" class="aux"></span>
-                                                    
-                                                    <input id="dano_id" type="hidden" name="dano_id" value="aux"/> 
-                                                    <input id="dano_informacao" type="hidden" name="dano_informacao" value="aux"/> 
-                                                    
-                                                    <input id="avaliacao_id" type="hidden" name="avaliacao_id" value="aux"/> 
-                                                    <input id="avaliacao_informacao" type="hidden" name="avaliacao_informacao" value="aux"/> 
-                                                    
-                                                    <input id="procedimento_id" type="hidden" name="procedimento_id" value="aux"/> 
-                                                    <input id="procedimento_informacao" type="hidden" name="procedimento_informacao" value="aux"/> 
-                                                    
-                                                    <input id="condicoes_id" type="hidden" name="condicoes_id" value="aux"/> 
-                                                    <input id="condicoes_informacao" type="hidden" name="condicoes_informacao" value="aux"/> 
-                                                    
-                                                    <input id="risco_id" type="hidden" name="risco_id" value="aux"/> 
-                                                    <input id="risco_informacao" type="hidden" name="risco_informacao" value="aux"/>
 
-                                                    <input id="local_id" type="hidden" name="local_id" value="aux"/> 
-                                                    <input id="local_informacao" type="hidden" name="local_informacao" value="aux"/>
+                                                    <form method="POST" action="/fatores">
+                                                        <input id="id_ea" type="hidden" name="id_ea" value=" {{ indice_ea }}"/>
+                                                        <input id="id_evol" type="hidden" name="id_evol" value="{{ indice_evol }}"/>
+                                                        
+                                                        <input id="dano_id" type="hidden" name="dano_id" value="aux"/> 
+                                                        <input id="dano_informacao" type="hidden" name="dano_informacao" value="aux"/> 
 
-                                                    <input id="setor_id" type="hidden" name="setor_id" value="aux"/> 
-                                                    <input id="setor_informacao" type="hidden" name="setor_informacao" value="aux"/>
+                                                        <input id="avaliacao_id" type="hidden" name="avaliacao_id" value="aux"/> 
+                                                        <input id="avaliacao_informacao" type="hidden" name="avaliacao_informacao" value="aux"/> 
 
-                                                    <input id="unidade_id" type="hidden" name="unidade_id" value="aux"/> 
-                                                    <input id="unidade_informacao" type="hidden" name="unidade_informacao" value="aux"/>
+                                                        <input id="procedimento_id" type="hidden" name="procedimento_id" value="aux"/> 
+                                                        <input id="procedimento_informacao" type="hidden" name="procedimento_informacao" value="aux"/> 
 
-                                                    <input id="desencadeante_id" type="hidden" name="desencadeante_id" value="aux"/> 
-                                                    <input id="desencadeante_informacao" type="hidden" name="desencadeante_informacao" value="aux"/>
+                                                        <input id="condicoes_id" type="hidden" name="condicoes_id" value="aux"/> 
+                                                        <input id="condicoes_informacao" type="hidden" name="condicoes_informacao" value="aux"/> 
+
+                                                        <input id="risco_id" type="hidden" name="risco_id" value="aux"/> 
+                                                        <input id="risco_informacao" type="hidden" name="risco_informacao" value="aux"/>
+
+                                                        <input id="local_id" type="hidden" name="local_id" value="aux"/> 
+                                                        <input id="local_informacao" type="hidden" name="local_informacao" value="aux"/>
+
+                                                        <input id="setor_id" type="hidden" name="setor_id" value="aux"/> 
+                                                        <input id="setor_informacao" type="hidden" name="setor_informacao" value="aux"/>
+
+                                                        <input id="unidade_id" type="hidden" name="unidade_id" value="aux"/> 
+                                                        <input id="unidade_informacao" type="hidden" name="unidade_informacao" value="aux"/>
+
+                                                        <input id="desencadeante_id" type="hidden" name="desencadeante_id" value="aux"/> 
+                                                        <input id="desencadeante_informacao" type="hidden" name="desencadeante_informacao" value="aux"/>
+                                                        <br>
+                                                        <input type="submit"/>
+                                                    </form>
                                                 </a>
                                             </li>   
                                         </ul>

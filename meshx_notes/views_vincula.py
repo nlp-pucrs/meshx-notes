@@ -6,7 +6,6 @@ import pandas as pd
 import logging
 class VinculaPageView(TemplateView):
     template_name = 'vincula.html'
-    logger = logging.getLogger(__name__)
 
     def get_context_data(self, **kwargs):
         context = super(VinculaPageView, self).get_context_data(**kwargs)
