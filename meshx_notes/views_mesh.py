@@ -54,7 +54,7 @@ class PacientePageView(TemplateView):
 			termos_semelhantes = 'Termos semelhantes'
 		elif(lingua == 'en'):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
-			caminho_dicionario = './data/dictMesh.dict_eng.gz'
+			caminho_dicionario = './data/dictMesh_eng.dict.gz'
 			caminho_indice = './data/indiceReversoEN.dict.gz'
 			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definition'
