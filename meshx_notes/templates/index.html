@@ -72,6 +72,18 @@
   .br {
     line-height: 150%;
   }
+
+  .word {
+      cursor: pointer;
+    }
+  .inativo_background{
+    background: white;
+  }
+
+  .inativo_linha{
+    border-bottom: 0px solid transparent;
+  }
+
 </style>
   <head>
 
@@ -127,6 +139,15 @@
             if ( jQuery( "input[name={{ver}}]" ).length )
              document.getElementsByName("{{ver}}")[({{target}}-1)*-1].checked = true;
           {% endfor %}
+      }
+
+      function verifica_sublinhado(nome_classe, cor){
+        
+        $( "div."+cor ).toggleClass( "inativo_background" );
+
+        $( "span."+nome_classe ).toggleClass( "inativo_linha" );
+
+
       }
 
     </script>
@@ -230,38 +251,38 @@
                   <ul class="list-unstyled mb-0">
                     <li>
                         <a>
-                          <div class="foo black"></div> &nbsp;
+                          <div class="foo black"></div> &nbsp;<span onclick="verifica_sublinhado('procedure', 'black')" class = "word">
                           {% if lingua == "pt" %} Procedimento
-                          {% else %} Procedure {% endif %}
+                          {% else %} Procedure {% endif %}</span>
 
                         </a>
                     </li>
                     <li>
                         <a>
-                          <div class="foo green"></div> &nbsp; 
+                          <div class="foo green"></div> &nbsp; <span onclick="verifica_sublinhado('diagnosis', 'green')" class = "word">
                           {% if lingua == "pt" %} Diagnóstico 
-                          {% else %} Diagnosis {% endif %}
+                          {% else %} Diagnosis {% endif %}</span>
                         </a>
                     </li>
                     <li>
                         <a>
-                            <div class="foo red "></div> &nbsp;
+                            <div class="foo red "></div> &nbsp;<span onclick="verifica_sublinhado('medication', 'red')" class = "word">
                             {% if lingua == "pt" %} Medicação 
-                            {% else %} Medication {% endif %}
+                            {% else %} Medication {% endif %}</span>
                         </a>
                     </li>
                     <li>
                         <a>
-                            <div class="foo blue"> </div> &nbsp;
+                            <div class="foo blue"> </div> &nbsp; <span onclick="verifica_sublinhado('anatomy', 'blue')"  class = "word">
                             {% if lingua == "pt" %} Anatomia 
-                            {% else %} Anatomy {% endif %}
+                            {% else %} Anatomy {% endif %}</span>
                         </a>
                     </li> 
                     <li>
                         <a>
-                            <div class="foo purple"> </div> &nbsp;
+                            <div class="foo purple"> </div> &nbsp;<span onclick="verifica_sublinhado('other', 'purple')" class = "word">
                             {% if lingua == "pt" %} Outros 
-                            {% else %} Other {% endif %}
+                            {% else %} Other {% endif %}</span>
                         </a>
                     </li>   
                   </ul>
