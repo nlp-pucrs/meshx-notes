@@ -101,7 +101,7 @@
 
     <script>
       $(document).ready(function(){
-          $("a").click(function(){
+          $("span").click(function(){
                  $("#informacoes").html($(this).attr("data-scope"));
                  $("#relacionados").html($(this).attr("data-terms"));
                  $("#nome").html($(this).attr("data-name"));
@@ -251,7 +251,7 @@
                   <ul class="list-unstyled mb-0">
                     <li>
                         <a>
-                          <div class="foo black"></div> &nbsp;<span onclick="verifica_sublinhado('procedure', 'black')" class = "word">
+                          <div onclick="verifica_sublinhado('procedure', 'black')" class="foo black word"></div> &nbsp;<span onclick="verifica_sublinhado('procedure', 'black')" class = "word">
                           {% if lingua == "pt" %} Procedimento
                           {% else %} Procedure {% endif %}</span>
 
@@ -259,28 +259,28 @@
                     </li>
                     <li>
                         <a>
-                          <div class="foo green"></div> &nbsp; <span onclick="verifica_sublinhado('diagnosis', 'green')" class = "word">
+                          <div onclick="verifica_sublinhado('diagnosis', 'green')" class="foo green word"></div> &nbsp; <span onclick="verifica_sublinhado('diagnosis', 'green')" class = "word">
                           {% if lingua == "pt" %} Diagnóstico 
                           {% else %} Diagnosis {% endif %}</span>
                         </a>
                     </li>
                     <li>
                         <a>
-                            <div class="foo red "></div> &nbsp;<span onclick="verifica_sublinhado('medication', 'red')" class = "word">
+                            <div onclick="verifica_sublinhado('medication', 'red')" class="foo red word "></div> &nbsp;<span onclick="verifica_sublinhado('medication', 'red')" class = "word">
                             {% if lingua == "pt" %} Medicação 
                             {% else %} Medication {% endif %}</span>
                         </a>
                     </li>
                     <li>
                         <a>
-                            <div class="foo blue"> </div> &nbsp; <span onclick="verifica_sublinhado('anatomy', 'blue')"  class = "word">
+                            <div onclick="verifica_sublinhado('anatomy', 'blue')" class="foo blue word"> </div> &nbsp; <span onclick="verifica_sublinhado('anatomy', 'blue')"  class = "word">
                             {% if lingua == "pt" %} Anatomia 
                             {% else %} Anatomy {% endif %}</span>
                         </a>
                     </li> 
                     <li>
                         <a>
-                            <div class="foo purple"> </div> &nbsp;<span onclick="verifica_sublinhado('other', 'purple')" class = "word">
+                            <div onclick="verifica_sublinhado('other', 'purple')" class="foo purple word"> </div> &nbsp;<span onclick="verifica_sublinhado('other', 'purple')" class = "word">
                             {% if lingua == "pt" %} Outros 
                             {% else %} Other {% endif %}</span>
                         </a>

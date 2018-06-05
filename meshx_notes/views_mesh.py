@@ -207,7 +207,7 @@ class PacientePageView(TemplateView):
 				#Sobrescreve a que tinha e bota com uma nova com o link etc.
 
 				nome = dictMesh[ID]['name'].replace('[', ' [')
-				evolucao[i] = start_underline+'<a style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</a>'+end_underline
+				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</span>'+end_underline
 				
 		#Junta tudo novamente
 
