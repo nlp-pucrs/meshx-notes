@@ -118,15 +118,15 @@ class PacientePageView(TemplateView):
 		for i in range(len(evolucao)):
 
 			palavra = evolucao[i].lower()
-			palavra_i = '<i>' + palavra +'</i>'
+			palavra_i = palavra +' _i'
 
 			if (i+2 < (len(evolucao))):
 				palavra_tri = palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower()
-				palavra_tri_i = '<i>' + palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower() + '</i>'
+				palavra_tri_i = palavra.lower()+" "+evolucao[i+1].lower()+" "+evolucao[i+2].lower() + ' _i'
 
 			if (i+1 < (len(evolucao))):
 				palavra_bi = palavra.lower()+" "+evolucao[i+1].lower()
-				palavra_bi_i = '<i>' + palavra.lower()+" "+evolucao[i+1].lower() + '</i>'
+				palavra_bi_i = palavra.lower()+" "+evolucao[i+1].lower() + ' _i'
 
 			indice_termos = ''
 			valida = 0
@@ -164,8 +164,10 @@ class PacientePageView(TemplateView):
 
 			if indice_termos != '':
 				if(valida == 2):
-					new_t = indice_termos.replace('</i>', '')
-					new_t = indice_termos.replace('<i>', '')
+					new_t = indice_termos.replace(' _i', '')
+					#new_t = indice_termos.replace('<i>', '')
+
+
 					
 				else:
 					new_t = indice_termos

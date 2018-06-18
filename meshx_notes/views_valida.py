@@ -69,11 +69,11 @@ class ValidaPageView(TemplateView):
 
 						new_indice = indice.replace(' _i', '')
 
-						if new_indice in ' '.join(dictMesh[ID]['terms']):
+						if new_indice in ' '.join(dictMesh[ID]['terms']) and new_indice != '':
 							if new_indice in serial:
 								for palavra in posicoes:
-									if new_indice in  palavra:
-										val_valida =  palavra[-1]
+									if new_indice ==  palavra[:-2]:
+										val_valida =  palavra[-1:]
 										
 							#Poe no dicionario
 							if  val_valida != 2:
