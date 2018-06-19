@@ -6,10 +6,13 @@ class Dicionarios():
 	dictMesh = {}
 	terms = []
 	scope = ""
+	similar = Similaridade()
+	headingParams = []
     
         
-	def __init__(self, wordModel=None):
+	def __init__(self, wordModel, headingParams = [1.0, 1.0, 5]):
 		self.wordModel = wordModel
+		self.headingParams = headingParams
 
 	def verificaQualifier(self, descriptor):
 		qualifier = '#'
@@ -41,9 +44,7 @@ class Dicionarios():
 			'qualifier': qualifier
 		}
 
-	def seleciona_TermosMesh(self, descriptor, qualifier, ID, heading):
-		similar = Similaridade();
-        
+	def seleciona_TermosMesh(self, descriptor, qualifier, ID, heading):        
 		for c in descriptor.findall('.ConceptList/'):
         
 			termos_similares = []
@@ -70,14 +71,14 @@ class Dicionarios():
 				palavra_similar = []  
 
 				#Pega os termos similares e armazena eles e a sua porcentagem em duas listas, uma para cada um
-				termos_similares, porc_lista = similar.verifica_similaridade( self.wordModel, novo, qualifier, termos_similares, porc_lista, 0.9, 0.89, 0.89, 0.89, 0.89)
+				termos_similares, porc_lista = self.similar.verifica_similaridade( self.wordModel, novo, qualifier, termos_similares, porc_lista, 0.9, 0.89, 0.89, 0.89, 0.89)
 
 
 			#Verifica se realmente e similar, termo por termo que foi armazenado acima
-			termos_similares, self.terms, porc_maior, flag = similar.verifica_valor(self.terms, termos_similares, self.indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
+			termos_similares, self.terms, porc_maior, flag = self.similar.verifica_valor(self.terms, termos_similares, self.indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
 			for i in range(0, len(termos_similares)-1):
 				self.add_IndiceReverso( termos_similares[i], ID, porc_maior[i], 0, flag)
-			self.dictMesh, indiceReverso, self.terms = similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
+			self.dictMesh, indiceReverso, self.terms = self.similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
 
 			palavraa = heading.replace('(','')
 			palavraa = palavraa.replace(')','')
@@ -88,12 +89,12 @@ class Dicionarios():
 			porc_lista = []
 			porc_medio = 0
 
-			termos_similares, porc_lista = similar.verifica_similaridade( self.wordModel, novo, qualifier, termos_similares, porc_lista, 0.9, 0.89, 0.89, 0.89, 0.89)
-			termos_similares, self.terms, porc_maior,  flag= similar.verifica_valor(self.terms, termos_similares, indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
+			termos_similares, porc_lista = self.similar.verifica_similaridade( self.wordModel, novo, qualifier, termos_similares, porc_lista, 0.9, 0.89, 0.89, 0.89, 0.89)
+			termos_similares, self.terms, porc_maior,  flag= self.similar.verifica_valor(self.terms, termos_similares, indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
 			
 			for i in range(0, len(termos_similares)-1):
 				self.add_IndiceReverso( termos_similares[i], ID, porc_maior[i], 0, flag)
-			self.dictMesh, self.indiceReverso, self.terms = similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
+			self.dictMesh, self.indiceReverso, self.terms = self.similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
 
             #Adicionando no dicionario MeSH
 
@@ -103,19 +104,26 @@ class Dicionarios():
 		import gzip, pickle
 
 		with gzip.open(nome+'.dict.gz','wb') as fp:
-			pickle.dump(dicionario,fp)
+			if(dicionario == "dictMesh"):
+				pickle.dump(self.dictMesh,fp)
+			else:
+				pickle.dump(self.indiceReverso,fp)
 			fp.close()
 
-	def carrega_Dicionario(self, nome, dicionario):
+	def carrega_Dicionario(self, nome):
 		import gzip, pickle
 
 		with gzip.open(nome+'.dict.gz','rb') as fp:
-			self.dictMesh = dicionario.load(fp)
+			if(nome == "dictMesh"):
+				self.dictMesh = pickle.load(fp)
+			else:
+				self.indiceReverso = pickle.load(fp)
 			fp.close()
+
 
 	def adiciona_termosPadrao_IndiceReverso(self):
 		for dui in list(self.dictMesh):
-			d = dicionario[str(dui)]
+			d = self.dictMesh[str(dui)]
 			for t in d['terms']:
 				if not('<i>' in t):
 					if(t.find('(') == -1):
@@ -134,10 +142,10 @@ class Dicionarios():
 					if(indice.lower()+" _i" in self.indiceReverso and self.indiceReverso[indice.lower()+" _i"]['flag'] == 4):
 		                
 						termos_similares = []
-						termos_similares, porc_lista = similar.verifica_similaridade( self.wordModel, indice, 'qualifier', termos_similares, [], 0.9, 0.89, 0.89, 0.89, 0.89)
+						termos_similares, porc_lista = self.similar.verifica_similaridade( self.wordModel, indice, 'qualifier', termos_similares, [], 0.9, 0.89, 0.89, 0.89, 0.89)
 
 						#gera_Lista
-						self.indiceReverso = similar.verifica_similaridade_media_repetido(self.wordModel, indice.lower(), self.indiceReverso[indice.lower()+" _i"]['ID'], termos_similares, self.indiceReverso, self.dictMesh, dui)          
+						self.indiceReverso = self.similar.verifica_similaridade_media_repetido(self.wordModel, indice.lower(), self.indiceReverso[indice.lower()+" _i"]['ID'], termos_similares, self.indiceReverso, self.dictMesh, dui)          
 					else:
 						self.add_IndiceReverso(indice, d['ID'], 0.99, 0.99, 4)
 				

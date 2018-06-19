@@ -89,7 +89,7 @@ class Similaridade():
 		if(id_Mesh in dictMesh):
 			for termo_mesh in dictMesh[id_Mesh]: 
 				if termo_mesh in wordModel.vocab: #Se o termo esta no word embeddings
-					sem_assento = remover_acentos(termo_mesh.lower())
+					sem_assento = self.remover_acentos(termo_mesh.lower())
 					palavra_similar = wordModel.most_similar_cosmul(sem_assento,topn=10)
 
 		            #Verifica a similariedade
@@ -109,7 +109,7 @@ class Similaridade():
 
 					flag = -1
 
-					if(indiceReverso[similar]['porc_similar'] < porc_medio \
+					if(similar in indiceReverso and indiceReverso[similar]['porc_similar'] < porc_medio \
 						and indiceReverso[similar]['porc_medio'] < porc_medio):   
 							flag = 2
 							porc_maior = porc_medio
@@ -137,10 +137,12 @@ class Similaridade():
 		palavra_similar = []
 		porc_medio = []
 		flag = -1
+		cont = 0
+		aux = 0
 		if(id_Mesh in dictMesh):
-			for termo_mesh in dictMesh[id_Mesh]: 
+			for termo_mesh in dictMesh[id_Mesh]['terms']: 
 				if termo_mesh in wordModel.vocab: #Se o termo esta no word embeddings
-					sem_assento = remover_acentos(termo_mesh.lower())
+					sem_assento = self.remover_acentos(termo_mesh.lower())
 					palavra_similar = wordModel.most_similar_cosmul(sem_assento,topn=10)
 
 		            #Verifica a similariedade
@@ -162,9 +164,9 @@ class Similaridade():
 			porc_medio.append(aux)
 
 		if(termo_id in dictMesh):
-			for termo_mesh in dictMesh[termo_id]: 
+			for termo_mesh in dictMesh[termo_id]['terms']: 
 				if termo_mesh in wordModel.vocab: #Se o termo esta no word embeddings
-					sem_assento = remover_acentos(termo_mesh.lower())
+					sem_assento = self.remover_acentos(termo_mesh.lower())
 					palavra_similar = wordModel.most_similar_cosmul(sem_assento,topn=10)
 
 		            #Verifica a similariedade
