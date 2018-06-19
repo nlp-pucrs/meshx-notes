@@ -1,3 +1,15 @@
+import time
+
+import numpy as np
+
+from gensim.models import KeyedVectors
+import unicodedata
+
+from unicodedata import normalize
+
+import gzip
+import xml.etree.ElementTree as ET
+
 from Similaridade import Similaridade
 
 class Dicionarios():
@@ -8,11 +20,88 @@ class Dicionarios():
 	scope = ""
 	similar = Similaridade()
 	headingParams = []
+	xmlMesh = ""
+	wordEmbedding = ""
+	qualifiersParams = []
+	printTime = ""
+	adicionaTermoPadrao = ""
     
         
-	def __init__(self, wordModel, headingParams = [1.0, 1.0, 5]):
-		self.wordModel = wordModel
+	def __init__(self, xmlMesh, wordEmbedding, headingParams = [1.0, 1.0, 5], qualifiersParams = [0.9, 0.89, 0.89, 0.89, 0.89], printTime=True, adicionaTermoPadrao=False):
+		self.xmlMesh = xmlMesh
+		self.wordEmbedding = wordModel
 		self.headingParams = headingParams
+		self.qualifiersParams = qualifiersParams
+		self.printTime = printTime
+		self.adicionaTermoPadrao = adicionaTermoPadrao
+
+		with gzip.open('pordesc2018.xml.gz') as pordesc2018:
+		    tree = ET.parse(pordesc2018)
+
+
+	def run():
+
+		time_qualifer = []
+		time_add_IndiceReverso = []
+		time_seleciona_TermosMesh = []
+		time_add_Mesh = []
+		time_adiciona_termosPadrao_IndiceReverso = []
+
+
+		cont = 0
+
+		KeyedVectors.load_word2vec_format(self.wordEmbedding, binary=True)
+
+		for i, d in enumerate(tree.findall("./DescriptorRecord")):
+		    if i > 100:
+		        break
+
+		    ID = d.find('.DescriptorUI').text
+		    
+		    start = time.time()
+
+		    qualifier = geraDict.verificaQualifier(d)
+
+		    end = time.time()
+		    time_qualifer.append(end - start)
+		    
+		    heading = d.find('.DescriptorName/String').text
+
+		    #Adicionando o heading inteiro no Mesh
+		    
+		    start = time.time()
+
+		    geraDict.add_IndiceReverso(heading, ID, headingParams[0], headingParams[1], headingParams[2])
+		    
+		    end = time.time()
+		    time_add_IndiceReverso.append(end - start)
+
+		    start = time.time()
+
+		    geraDict.seleciona_TermosMesh(d, qualifier, ID, heading)
+
+		    end = time.time()
+		    time_seleciona_TermosMesh.append(end - start)
+		    
+		    start = time.time()
+
+		    geraDict.add_Mesh(heading, ID, qualifier )
+
+		    end = time.time()
+		    time_add_Mesh.append(end - start)
+
+		    #geraDict.indiceReverso['term']
+
+		'''start = time.time()
+		indiceReverso = geraDict.adiciona_termosPadrao_IndiceReverso()
+		end = time.time()
+		time_adiciona_termosPadrao_IndiceReverso += round(end - start,3)
+		'''
+
+		#geraDict.salva_Dicionario('dictMesh', 'dictMesh')
+		#geraDict.salva_Dicionario('indiceReverso', 'indiceReverso')
+
+		return round(np.mean(time_qualifer), 5), round(np.mean(time_add_IndiceReverso), 5), round(np.mean(time_seleciona_TermosMesh), 5), round(np.mean(time_add_Mesh), 5)
 
 	def verificaQualifier(self, descriptor):
 		qualifier = '#'
