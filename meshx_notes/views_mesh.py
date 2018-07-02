@@ -51,7 +51,7 @@ class PacientePageView(TemplateView):
 			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definicao'
 			enviar = "Enviar"
-			termos_semelhantes = 'Termos semelhantes'
+			termos_mesh = 'Termos Mesh'
 		elif(lingua == 'en'):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
 			caminho_dicionario = './data/dictMesh_eng.dict.gz'
@@ -59,7 +59,7 @@ class PacientePageView(TemplateView):
 			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definition'
 			enviar = "Send"
-			termos_semelhantes = 'Similar terms'
+			termos_mesh = 'Mesh terms'
 
 
 		current_path = os.path.dirname(os.path.realpath(__file__))
@@ -178,30 +178,68 @@ class PacientePageView(TemplateView):
 				if(ID in dictMesh):
 					term = dictMesh[ID]['terms']
 
+				for i in range(len(term)-1):
+					if("<i>" in term[i]):
+						posi = i
+						term[i-1] = term[i-1]+"______"
+						break
+
 				termos = '<br/>- '.join(term[0:-1])
-				termos += ''.join(term[-1])
+				termos = termos.replace("______", '<br/><br/><strong>Termos semelhantes</strong>')
+
 				#termos = '<br/>- '.join(term)
 
 				if "</i>" in termos:
 					termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
 				
 				#Verifica o qualifier, se ha, entao salva, senao bota vazio
+				#Adiciona a o nome do qualifier com a cor dele
 
 				if(dictMesh[ID]['qualifier'] == 'anatomy & histology'):
 					start_underline = '<span class = "anatomy">'
 					end_underline = '</span>'
+
+					if(lingua == 'pt'):
+						qualifier_texto = "<span class=\'anatomy_word\'>Anatomia</span>"
+					elif(lingua == 'en'):
+						qualifier_texto = "<span class=\'anatomy_word\'>Anamtomy</span>"
+
 				elif(dictMesh[ID]['qualifier'] == 'methods'):
 					start_underline = '<span class = "procedure">'
 					end_underline = "</span>"
+
+					if(lingua == 'pt'):
+						qualifier_texto = "<span class=\'procedure_word\'>Procedimento</span>"
+					elif(lingua == 'en'):
+						qualifier_texto = "<span class=\'procedure_word\'>Procedure</span>"
+
 				elif(dictMesh[ID]['qualifier'] == 'diagnosis'):
 					start_underline = '<span class = "diagnosis">'
 					end_underline = '</span>'
+
+					if(lingua == 'pt'):
+						qualifier_texto = "<span class=\'diagnosis_word\'>Diagnóstico</span>"
+					elif(lingua == 'en'):
+						qualifier_texto = "<span class=\'diagnosis_word\'>Diagnosis</span>"
+
 				elif(dictMesh[ID]['qualifier'] == 'pharmacology'):
 					start_underline = '<span class = "medication">'
 					end_underline = '</span>'
+
+					if(lingua == 'pt'):
+						qualifier_texto = "<span class=\'medication_word\'>Medicação</span>"
+					elif(lingua == 'en'):
+						qualifier_texto = "<span class=\'medication_word\'>Medication</span>"
+
 				elif(dictMesh[ID]['qualifier'] == '#'):
 					start_underline = '<span class = "other">'
 					end_underline = '</span>'
+
+					if(lingua == 'pt'):
+						qualifier_texto = "<span class=\'other_word\'>Outro</span>"
+					elif(lingua == 'en'):
+						qualifier_texto = "<span class=\'other_word\'>Other</span>"
+
 				else:
 					start_underline = ''
 					end_underline = ''
@@ -209,7 +247,7 @@ class PacientePageView(TemplateView):
 				#Sobrescreve a que tinha e bota com uma nova com o link etc.
 
 				nome = dictMesh[ID]['name'].replace('[', ' [')
-				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_semelhantes+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</span>'+end_underline
+				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-qualifier="'+qualifier_texto+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_mesh+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</span>'+end_underline
 				
 		#Junta tudo novamente
 

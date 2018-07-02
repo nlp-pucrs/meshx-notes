@@ -12,7 +12,9 @@ import xml.etree.ElementTree as ET
 
 from Similaridade import Similaridade
 
-class Dicionarios():
+import pylab
+
+class dicionarios_graficos():
 	"""docstring for ClassName"""
 	indiceReverso = {}
 	dictMesh = {}
@@ -27,6 +29,10 @@ class Dicionarios():
 	adicionaTermoPadrao = ""
 	tree = ""
 	wordModel = ""
+	contador = 0
+
+	px = []
+	py = []
     
         
 	def __init__(self, xmlMesh, wordEmbedding, headingParams = [1.0, 1.0, 5], qualifiersParams = [0.9, 0.89, 0.89, 0.89, 0.89], printTime=True, adicionaTermoPadrao=False):
@@ -54,8 +60,10 @@ class Dicionarios():
 		cont = 0
 
 		for i, d in enumerate(self.tree.findall("./DescriptorRecord")):
-			#if i > 100:
-			#	break
+			if i > 10:
+				break
+
+			self.contador += 1
 
 			ID = d.find('.DescriptorUI').text
 		    
@@ -97,8 +105,16 @@ class Dicionarios():
 				indiceReverso = self.adiciona_termosPadrao_IndiceReverso()
 				end = time.time()
 				time_adiciona_termosPadrao_IndiceReverso += round(end - start,3)
-		
 
+			self.contador += self.similar.tempo()
+			self.px.append(i)
+			self.py.append(self.contador)
+
+
+		
+		pylab.figure(2)
+		pylab.plot(self.px,self.py)
+		pylab.show()
 		#self.salva_Dicionario('dictMesh', 'dictMesh')
 		#self.salva_Dicionario('indiceReverso', 'indiceReverso')
 
@@ -113,6 +129,7 @@ class Dicionarios():
 			if(teste_qualifier == 'anatomy & histology' or teste_qualifier == 'pharmacology' or teste_qualifier == 'methods' or teste_qualifier == 'diagnosis'):
 				qualifier = teste_qualifier
 				break
+			self.contador += 1
 
 		return qualifier
 
@@ -137,7 +154,7 @@ class Dicionarios():
 
 	def seleciona_TermosMesh(self, descriptor, qualifier, ID, heading):        
 		for c in descriptor.findall('.ConceptList/'):
-        
+			self.contador += 1
 			termos_similares = []
 			porc_lista = []
 			porc_medio = 0
@@ -149,7 +166,7 @@ class Dicionarios():
 				self.terms.append(t.find('./String').text)
 				## INICIO VERIFICANDO
 
-
+				self.contador += 1
 				palavraa = t.find('./String').text.lower()
 
 				palavraa = palavraa.replace('(','')
@@ -169,6 +186,7 @@ class Dicionarios():
 			termos_similares, self.terms, porc_maior, flag = self.similar.verifica_valor(self.terms, termos_similares, self.indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
 			for i in range(0, len(termos_similares)-1):
 				self.add_IndiceReverso( termos_similares[i], ID, porc_maior[i], 0, flag)
+				self.contador += 1
 			self.dictMesh, indiceReverso, self.terms = self.similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
 
 			palavraa = heading.replace('(','')
@@ -184,6 +202,7 @@ class Dicionarios():
 			termos_similares, self.terms, porc_maior,  flag= self.similar.verifica_valor(self.terms, termos_similares, indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
 			
 			for i in range(0, len(termos_similares)-1):
+				self.contador += 1
 				self.add_IndiceReverso( termos_similares[i], ID, porc_maior[i], 0, flag)
 			self.dictMesh, self.indiceReverso, self.terms = self.similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
 
@@ -218,8 +237,10 @@ class Dicionarios():
 
 	def adiciona_termosPadrao_IndiceReverso(self):
 		for dui in list(self.dictMesh):
+			self.contador += 1
 			d = self.dictMesh[str(dui)]
 			for t in d['terms']:
+				self.contador += 1
 				if not('<i>' in t):
 					if(t.find('(') == -1):
 						novo = t.replace(' ', '_')

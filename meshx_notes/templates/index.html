@@ -25,6 +25,26 @@
     border-bottom-color: #871F78;
   }
 
+  .procedure_word{
+    color: black;
+  }
+
+  .diagnosis_word{
+    color: green;
+  }
+
+  .medication_word{
+    color: red;
+  }
+
+  .anatomy_word{
+    color: blue;
+  }
+
+  .other_word{
+    color: #871F78;
+  }
+
   .footer {
     /*position:absolute;*/
     bottom:-200;
@@ -103,6 +123,7 @@
       $(document).ready(function(){
           $("span").click(function(){
                  $("#informacoes").html($(this).attr("data-scope"));
+                 $("#qualifier").html($(this).attr("data-qualifier"));
                  $("#relacionados").html($(this).attr("data-terms"));
                  $("#nome").html($(this).attr("data-name"));
                  $("#id").html($(this).attr("data-id"));
@@ -297,6 +318,7 @@
               </h5>
               <div class="card-body">
                 <div id="nome"></div>
+                <div id="qualifier"></div>
 
                 <div id="id"></div>
                 <div id="informacoes"></div>
