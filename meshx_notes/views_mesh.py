@@ -46,20 +46,24 @@ class PacientePageView(TemplateView):
 
 		if(lingua == 'pt'):
 			caminho_evolucao = './data/excel_evol.csv.gz'
-			caminho_dicionario = './data/dictMesh.dict.gz'
+			caminho_dicionario = './data/dictMesh_.dict.gz'
 			caminho_indice = './data/indiceReversoPT.dict.gz'
 			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definicao'
 			enviar = "Enviar"
-			termos_mesh = 'Termos Mesh'
+			html_semelhantes_inicio = '<br/><br/><strong>Termos Semelhantes</strong><br/>- '
+			html_mesh_inicio = '<br/><br/><strong>Termos Mesh</strong><br/>- '
+			fim = -135
 		elif(lingua == 'en'):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
-			caminho_dicionario = './data/dictMesh_eng.dict.gz'
+			caminho_dicionario = './data/dictMesh.dict_eng_.gz'
 			caminho_indice = './data/indiceReversoEN.dict.gz'
 			caminho_valida = './data/dictValida.dict.gz'
 			definicao = 'Definition'
 			enviar = "Send"
-			termos_mesh = 'Mesh terms'
+			html_semelhantes_inicio = '<br/><br/><strong>Similar Terms</strong><br/>- '
+			html_mesh_inicio = '<br/><br/><strong>Mesh Terms</strong><br/>- '
+			fim = -127
 
 
 		current_path = os.path.dirname(os.path.realpath(__file__))
@@ -175,23 +179,36 @@ class PacientePageView(TemplateView):
 
 
 				ID = indiceReverso[indice_termos]['ID']	
+
+				verifica_mesh = 0
+				verifica_similar = 0 
+
 				if(ID in dictMesh):
 					term = dictMesh[ID]['terms']
+					html_mesh = []
+					html_similar = []
 
-				for i in range(len(term)-1):
-					if("<i>" in term[i]):
-						posi = i
-						term[i-1] = term[i-1]+"______"
-						break
+					for t in term:
+						if not("<i>" in t):
+							html_mesh.append(t)
+						else:
+							html_similar.append(t[:fim])
 
-				termos = '<br/>- '.join(term[0:-1])
-				termos = termos.replace("______", '<br/><br/><strong>Termos semelhantes</strong>')
 
-				#termos = '<br/>- '.join(term)
-
-				if "</i>" in termos:
-					termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
+				if(len(html_similar)!=0):
+					html_termos = html_semelhantes_inicio
+					html_termos += '<br/>- '.join(html_similar)+"</i>"
+				else:
+					html_termos = ""
 				
+				html_termos += html_mesh_inicio
+				html_termos += '<br/>- '.join(html_mesh[:-1])
+
+				#if "</i>" in termos:
+				#	termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
+				
+				termos = html_termos
+
 				#Verifica o qualifier, se ha, entao salva, senao bota vazio
 				#Adiciona a o nome do qualifier com a cor dele
 
@@ -247,7 +264,7 @@ class PacientePageView(TemplateView):
 				#Sobrescreve a que tinha e bota com uma nova com o link etc.
 
 				nome = dictMesh[ID]['name'].replace('[', ' [')
-				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-qualifier="'+qualifier_texto+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="<strong>'+termos_mesh+':</strong><br/>- '+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</span>'+end_underline
+				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-qualifier="'+qualifier_texto+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="'+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</span>'+end_underline
 				
 		#Junta tudo novamente
 
