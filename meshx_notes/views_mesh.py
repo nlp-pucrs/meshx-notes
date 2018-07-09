@@ -44,6 +44,11 @@ class PacientePageView(TemplateView):
 		if lingua == None or (lingua != 'pt' and lingua != 'en'):
 			lingua = 'pt'
 
+		val = self.request.GET.get('val')
+
+		if val == None or (val != '0' and val != '1'):
+			val = '1'
+
 		if(lingua == 'pt'):
 			caminho_evolucao = './data/excel_evol.csv.gz'
 			caminho_dicionario = './data/dictMesh_.dict.gz'
@@ -52,8 +57,7 @@ class PacientePageView(TemplateView):
 			definicao = 'Definicao'
 			enviar = "Enviar"
 			html_semelhantes_inicio = '<br/><br/><strong>Termos Semelhantes</strong><br/>- '
-			html_mesh_inicio = '<br/><br/><strong>Termos Mesh</strong><br/>- '
-			fim = -135
+			html_mesh_inicio = '<br/><br/><strong>Termos Mesh</strong>'
 		elif(lingua == 'en'):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
 			caminho_dicionario = './data/dictMesh.dict_eng_.gz'
@@ -63,7 +67,6 @@ class PacientePageView(TemplateView):
 			enviar = "Send"
 			html_semelhantes_inicio = '<br/><br/><strong>Similar Terms</strong><br/>- '
 			html_mesh_inicio = '<br/><br/><strong>Mesh Terms</strong><br/>- '
-			fim = -127
 
 
 		current_path = os.path.dirname(os.path.realpath(__file__))
@@ -177,9 +180,10 @@ class PacientePageView(TemplateView):
 					new_t = indice_termos
 					new_t = indice_termos
 
-
-				ID = indiceReverso[indice_termos]['ID']	
-
+				if(indiceReverso[indice_termos]):
+					ID = indiceReverso[indice_termos]['ID']	
+				elif(indiceReverso[indice_termos+" _i"]):
+					ID = indiceReverso[indice_termos+" _i"]['ID']	
 				verifica_mesh = 0
 				verifica_similar = 0 
 
@@ -189,10 +193,13 @@ class PacientePageView(TemplateView):
 					html_similar = []
 
 					for t in term:
+						#if("hidden" in t):
+							#continue
+
 						if not("<i>" in t):
 							html_mesh.append(t)
 						else:
-							html_similar.append(t[:fim])
+							html_similar.append(t)
 
 
 				if(len(html_similar)!=0):
@@ -202,12 +209,12 @@ class PacientePageView(TemplateView):
 					html_termos = ""
 				
 				html_termos += html_mesh_inicio
-				html_termos += '<br/>- '.join(html_mesh[:-1])
-
-				#if "</i>" in termos:
-				#	termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
+				html_termos += '<br/>- '.join(html_mesh)
 				
 				termos = html_termos
+
+				if "</i>" in termos and val == '0':
+					termos = termos+"<br/><br/><button onclick='cbx3()'>Enviar</button>"
 
 				#Verifica o qualifier, se ha, entao salva, senao bota vazio
 				#Adiciona a o nome do qualifier com a cor dele
@@ -219,7 +226,7 @@ class PacientePageView(TemplateView):
 					if(lingua == 'pt'):
 						qualifier_texto = "<span class=\'anatomy_word\'>Anatomia</span>"
 					elif(lingua == 'en'):
-						qualifier_texto = "<span class=\'anatomy_word\'>Anamtomy</span>"
+						qualifier_texto = "<span class=\'anatomy_word\'>Anatomy</span>"
 
 				elif(dictMesh[ID]['qualifier'] == 'methods'):
 					start_underline = '<span class = "procedure">'
@@ -264,7 +271,7 @@ class PacientePageView(TemplateView):
 				#Sobrescreve a que tinha e bota com uma nova com o link etc.
 
 				nome = dictMesh[ID]['name'].replace('[', ' [')
-				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-qualifier="'+qualifier_texto+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="'+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'">'+new_t+'</span>'+end_underline
+				evolucao[i] = start_underline+'<span class = "word" style="color:inherit; text-decoration:none" href="#" data-id="<strong>ID: </strong>'+ID+'<br/><br/>" data-qualifier="'+qualifier_texto+'<br/><br/>" data-name="<h3><a target= \'_blank\' href=\'https://meshb.nlm.nih.gov/record/ui?ui='+ID+'\'>'+dictMesh[ID]['name']+'<a></h3><br/>"  data-terms="'+termos+'" data-scope="<strong>'+definicao+':</strong> '+dictMesh[ID]['scope']+'" data-valida="'+val+'">'+new_t+'</span>'+end_underline
 				
 		#Junta tudo novamente
 
@@ -281,4 +288,5 @@ class PacientePageView(TemplateView):
 		context['ultima_posicao'] = len(prescription.loc[::])
 		context['lingua'] = lingua
 		context['verificados'] = verificados
+		context['val'] = val
 		return context

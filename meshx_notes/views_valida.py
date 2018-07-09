@@ -62,18 +62,22 @@ class ValidaPageView(TemplateView):
 				val_valida = 2
 
 				termos = ' '.join(dictMesh[ID]['terms'])
+
 				for indice in indiceReverso:
 					if '_i' in indice:
-						context['eu'] = "estou aqui!"
 						val_valida = 2
 
 						new_indice = indice.replace(' _i', '')
 
 						if new_indice in ' '.join(dictMesh[ID]['terms']) and new_indice != '':
 							if new_indice in serial:
+								context['eu'] = new_indice
 								for palavra in posicoes:
 									if new_indice ==  palavra[:-2]:
 										val_valida =  palavra[-1:]
+										context['eu'] = indice
+
+
 										
 							#Poe no dicionario
 							if  val_valida != 2:
@@ -81,6 +85,8 @@ class ValidaPageView(TemplateView):
 									'ID': ID,
 									'target': val_valida
 								}
+
+								context['eu'] = 'val_valida'
 								
 
 			#Salva o dicionario
