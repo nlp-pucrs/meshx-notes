@@ -26,12 +26,40 @@ import gzip, pickle
 class ValidaPageView(TemplateView):
 	template_name = 'valida.html'
 
+	def zera_validaEN(self):
+		dictValida = {}
+
+		import gzip, pickle
+
+		with gzip.open('dictValidaEN.dict.gz','wb') as fp:
+			pickle.dump(dictValida,fp)
+			fp.close()
+
+	def zera_validaPT(self):
+		dictValida = {}
+
+		import gzip, pickle
+
+		with gzip.open('dictValidaPT.dict.gz','wb') as fp:
+			pickle.dump(dictValida,fp)
+			fp.close()
+
+
 	def get_context_data(self, **kwargs):
 		context = super(ValidaPageView, self).get_context_data(**kwargs)
 		current_path = os.path.dirname(os.path.realpath(__file__))
-		caminho_dicionario = './data/dictMesh.dict.gz'
-		caminho_indice = './data/indiceReversoPT.dict.gz'
-		caminho_valida = './data/dictValida.dict.gz'
+
+		idioma  = self.request.GET.get('l')
+
+		if idioma == "pt":
+			caminho_dicionario = './data/dictMesh_.dict.gz'
+			caminho_indice = './data/indiceReversoPT.dict.gz'
+			caminho_valida = './data/dictValidaPT.dict.gz'
+		else:
+			caminho_dicionario = './data/dictMesh.dict_eng_.gz'
+			caminho_indice = './data/indiceReversoEN.dict.gz'
+			caminho_valida = './data/dictValidaEN.dict.gz'
+				
 		caminho_dicionario = os.path.join(current_path, caminho_dicionario)
 		caminho_indice = os.path.join(current_path, caminho_indice)
 		caminho_valida = os.path.join(current_path, caminho_valida)
@@ -69,25 +97,24 @@ class ValidaPageView(TemplateView):
 
 						new_indice = indice.replace(' _i', '')
 
-						if new_indice in ' '.join(dictMesh[ID]['terms']) and new_indice != '':
-							if new_indice in serial:
-								context['eu'] = new_indice
-								for palavra in posicoes:
-									if new_indice ==  palavra[:-2]:
-										val_valida =  palavra[-1:]
-										context['eu'] = indice
+					if new_indice in ' '.join(dictMesh[ID]['terms']) and new_indice != '':
+						if new_indice in serial:
+							for palavra in posicoes:
+								if new_indice ==  palavra[:-2]:
+									val_valida =  palavra[-1:]
+									#context['eu'] = indice
 
 
-										
-							#Poe no dicionario
-							if  val_valida != 2:
-								dictValida[new_indice] = {
-									'ID': ID,
-									'target': val_valida
-								}
+									
+						#Poe no dicionario
+						if  val_valida != 2:
+							dictValida[new_indice] = {
+								'ID': ID,
+								'target': val_valida
+							}
 
-								context['eu'] = 'val_valida'
-								
+							context['eu'] = new_indice
+							
 
 			#Salva o dicionario
 				with gzip.open(caminho_valida,'wb') as fp:

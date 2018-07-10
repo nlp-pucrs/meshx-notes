@@ -150,13 +150,14 @@
           }
 
           ID = document.getElementsByName("ID")[0].value;
+          idioma = document.getElementsByName("idioma")[0].value;
 
 
           alert(serial)
 
-          $.get( "/valida?serial="+serial+"&ID="+ID);
+          $.get( "/valida?serial="+serial+"&ID="+ID+"&l="+idioma);
 
-          alert("Enviado com sucesso, os dados serão atualizados na próxima sessão")
+          alert("Enviado com sucesso, os dados serão atualizados na próxima sessão");
       }    
 
 
@@ -210,9 +211,9 @@
             <li class="nav-item menu">  </li>
             <li class="nav-item">
               {% if lingua == "pt" %}
-                <a class="nav-link" href="?id={{ indice }}&l=en"> EN 
+                <a class="nav-link" name="idioma" href="?id={{ indice }}&l=en"> EN 
               {% else %}
-                <a class="nav-link" href="?id={{ indice }}&l=pt"> PT 
+                <a class="nav-link" name="idioma" href="?id={{ indice }}&l=pt"> PT 
               {% endif %}
             </a>
             </li>

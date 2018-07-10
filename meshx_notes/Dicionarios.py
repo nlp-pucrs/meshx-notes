@@ -14,28 +14,18 @@ from Similaridade import Similaridade
 
 class Dicionarios():
 	"""docstring for ClassName"""
+	cont = 0
+	dictMesh = {}	
 	indiceReverso = {}
-	dictMesh = {}
-	terms = []
-	scope = ""
-	similar = Similaridade()
-	headingParams = []
-	xmlMesh = ""
-	wordEmbedding = ""
-	qualifiersParams = []
-	printTime = ""
-	adicionaTermoPadrao = ""
-	tree = ""
 	wordModel = ""
+	scope = ""
+	terms = []
     
         
-	def __init__(self, xmlMesh, wordEmbedding, headingParams = [1.0, 1.0, 5], qualifiersParams = [0.9, 0.89, 0.89, 0.89, 0.89], printTime=True, adicionaTermoPadrao=False):
+	def __init__(self, xmlMesh, wordEmbedding, printTime=True):
 		self.xmlMesh = xmlMesh
 		self.wordEmbedding = wordEmbedding
-		self.headingParams = headingParams
-		self.qualifiersParams = qualifiersParams
 		self.printTime = printTime
-		self.adicionaTermoPadrao = adicionaTermoPadrao
 		self.wordModel = KeyedVectors.load_word2vec_format(self.wordEmbedding, binary=True)
 
 		with gzip.open(self.xmlMesh) as pordesc2018:
@@ -57,6 +47,8 @@ class Dicionarios():
 			#if i > 100:
 			#	break
 
+			self.terms = []
+
 			ID = d.find('.DescriptorUI').text
 		    
 			start = time.time()
@@ -66,37 +58,36 @@ class Dicionarios():
 			end = time.time()
 			time_qualifer.append(end - start)
 		    
-			heading = d.find('.DescriptorName/String').text
+			heading = d.find('.DescriptorName/String').text.lower()+" _i"
 
 		    #Adicionando o heading inteiro no Mesh
 
 			start = time.time()
 
-			self.add_IndiceReverso(heading, ID, self.headingParams[0], self.headingParams[1], self.headingParams[2])
+			self.add_IndiceReverso(d.find('.DescriptorUI').text, heading)
 
 			end = time.time()
+
 			time_add_IndiceReverso.append(end - start)
 
 			start = time.time()
 
-			self.seleciona_TermosMesh(d, qualifier, ID, heading)
+			self.seleciona_TermosMesh(qualifier, ID, heading, d)
 
 			end = time.time()
+
 			time_seleciona_TermosMesh.append(end - start)
 
+			self.seleciona_heading_primeiraParte(d)
+
 			start = time.time()
+
+
 
 			self.add_Mesh(heading, ID, qualifier )
 
 			end = time.time()
 			time_add_Mesh.append(end - start)
-
-		    #self.indiceReverso['term']
-			if(self.adicionaTermoPadrao):
-				start = time.time()
-				indiceReverso = self.adiciona_termosPadrao_IndiceReverso()
-				end = time.time()
-				time_adiciona_termosPadrao_IndiceReverso += round(end - start,3)
 		
 
 		#self.salva_Dicionario('dictMesh', 'dictMesh')
@@ -105,10 +96,10 @@ class Dicionarios():
 		if(self.printTime):
 			return round(np.mean(time_qualifer), 5), round(np.mean(time_add_IndiceReverso), 5), round(np.mean(time_seleciona_TermosMesh), 5), round(np.mean(time_add_Mesh), 5)
 
-	def verificaQualifier(self, descriptor):
+	def verificaQualifier(self, d):
 		qualifier = '#'
-
-		for aql in descriptor.findall('.AllowableQualifiersList/AllowableQualifier/QualifierReferredTo/QualifierName'):
+	
+		for aql in d.findall('.AllowableQualifiersList/AllowableQualifier/QualifierReferredTo/QualifierName'):
 			teste_qualifier = aql.find('./String').text
 			if(teste_qualifier == 'anatomy & histology' or teste_qualifier == 'pharmacology' or teste_qualifier == 'methods' or teste_qualifier == 'diagnosis'):
 				qualifier = teste_qualifier
@@ -116,15 +107,10 @@ class Dicionarios():
 
 		return qualifier
 
-	def add_IndiceReverso(self, heading, ID, porc_similar, porc_medio, flag):
-		
-		self.indiceReverso[heading.lower()+" _i"] = {
-			'ID': ID,
-			'porc_similar': porc_similar,
-			'porc_medio': porc_medio,
-			'flag': flag
-
-		}
+	def add_IndiceReverso(self, ID, termo):
+		self.indiceReverso[termo] = {
+			'ID': ID
+		} 
 
 	def add_Mesh(self, heading, ID, qualifier):
 		self.dictMesh[ID] = {
@@ -135,61 +121,52 @@ class Dicionarios():
 			'qualifier': qualifier
 		}
 
-	def seleciona_TermosMesh(self, descriptor, qualifier, ID, heading):        
+	def seleciona_TermosMesh(self, qualifier, ID, heading, descriptor):        
 		for c in descriptor.findall('.ConceptList/'):
-        
-			termos_similares = []
-			porc_lista = []
-			porc_medio = 0
 
 			if c.find('./ScopeNote') != None:
 				self.scope = c.find('./ScopeNote').text.replace('\n','').strip()
-			cont = 0
-			for t in c.findall('./TermList/'):            
+			for t in c.findall('./TermList/'):
+				if not("por" in t.find('./TermUI').text):
+					continue
 				self.terms.append(t.find('./String').text)
-				## INICIO VERIFICANDO
 
+				self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, (t.find('./String').text.lower()))
+				
+				palavra_similar = []
 
-				palavraa = t.find('./String').text.lower()
+				if t.find('./String').text.lower() in self.wordModel.vocab:
+					sem_assento = self.remover_acentos(t.find('./String').text)
+					palavra_similar = self.wordModel.most_similar_cosmul(sem_assento.lower(),topn=10)
+					for palavra_similar, porcentagem in palavra_similar:
+						if(porcentagem > 0.9 and qualifier != 'pharmacology'):
+							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
+							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, palavra_similar.lower()+" _i")
+					        
+						elif(porcentagem > 0.93 and qualifier == 'pharmacology'):
+							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
+							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, palavra_similar.lower()+" _i")
 
-				palavraa = palavraa.replace('(','')
-				palavraa = palavraa.replace(')','')
-				palavraa = palavraa.replace('[','')
-				palavraa = palavraa.replace(']','')
+	def seleciona_heading_primeiraParte(self, d):
+		heading = d.find('.DescriptorName/String').text.lower()
 
-				novo = palavraa.split(' ')
+		novo = heading.replace(' ', '_')
+		novo = novo.replace('[', ' ')
+		novo = novo.replace('(', ' ')
+		novo = novo.split(' ')
+		indice = novo[0]
+		indice = indice.replace('_', ' ')
 
-				palavra_similar = []  
+		if(indice != '' and indice[-1] == ' '):
+			indice = indice[0:-1]
 
-				#Pega os termos similares e armazena eles e a sua porcentagem em duas listas, uma para cada um
-				termos_similares, porc_lista = self.similar.verifica_similaridade( self.wordModel, novo, qualifier, termos_similares, porc_lista, self.qualifiersParams[0], self.qualifiersParams[1], self.qualifiersParams[2], self.qualifiersParams[3], self.qualifiersParams[4])
+		indice = self.remover_acentos(indice)
 
+		self.add_IndiceReverso(d.find('.DescriptorUI').text, indice.lower()+" _i")
 
-			#Verifica se realmente e similar, termo por termo que foi armazenado acima
-			termos_similares, self.terms, porc_maior, flag = self.similar.verifica_valor(self.terms, termos_similares, self.indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
-			for i in range(0, len(termos_similares)-1):
-				self.add_IndiceReverso( termos_similares[i], ID, porc_maior[i], 0, flag)
-			self.dictMesh, indiceReverso, self.terms = self.similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
+		#terms.append(indice)
 
-			palavraa = heading.replace('(','')
-			palavraa = palavraa.replace(')','')
-
-			novo = palavraa.split(' ')
-
-			termos_similares = []
-			porc_lista = []
-			porc_medio = 0
-
-			termos_similares, porc_lista = self.similar.verifica_similaridade( self.wordModel, novo, qualifier, termos_similares, porc_lista, self.qualifiersParams[0], self.qualifiersParams[1], self.qualifiersParams[2], self.qualifiersParams[3], self.qualifiersParams[4])
-			termos_similares, self.terms, porc_maior,  flag= self.similar.verifica_valor(self.terms, termos_similares, indiceReverso, porc_lista, self.dictMesh, descriptor.find('.DescriptorUI').text)
-			
-			for i in range(0, len(termos_similares)-1):
-				self.add_IndiceReverso( termos_similares[i], ID, porc_maior[i], 0, flag)
-			self.dictMesh, self.indiceReverso, self.terms = self.similar.verifica_similaridade_media(self.wordModel, termos_similares, c.findall('./TermList/'), self.indiceReverso, self.dictMesh,ID, self.terms)
-
-            #Adicionando no dicionario MeSH
-
-			self.terms.append(" <input type='hidden' name='ID' value='"+ID+"'/> ")
+		self.terms.append(" <input type='hidden' name='ID' value='"+d.find('.DescriptorUI').text+"'/> ")   
 
 	def salvaIndiceReverso(self, nome):
 		import gzip, pickle
@@ -215,32 +192,5 @@ class Dicionarios():
 				self.indiceReverso = pickle.load(fp)
 			fp.close()
 
-
-	def adiciona_termosPadrao_IndiceReverso(self):
-		for dui in list(self.dictMesh):
-			d = self.dictMesh[str(dui)]
-			for t in d['terms']:
-				if not('<i>' in t):
-					if(t.find('(') == -1):
-						novo = t.replace(' ', '_')
-						novo = t.split('[')
-					elif(t[-1] == ')'):
-						novo = t.replace(' ', '_')
-						novo = t.split('(')
-					indice = novo[0]
-					indice = indice.replace('_', ' ')
-					if(indice != '' and indice[-1] == ' '):
-						indice = indice[0:-1]
-		            ## antes de adicionar o termo, remover o que esta entre parenteses -(blabla)-
-		            #if(indice.lower() in self.indiceReverso):
-		            
-					if(indice.lower()+" _i" in self.indiceReverso and self.indiceReverso[indice.lower()+" _i"]['flag'] == 4):
-		                
-						termos_similares = []
-						termos_similares, porc_lista = self.similar.verifica_similaridade( self.wordModel, indice, 'qualifier', termos_similares, [], 0.9, 0.89, 0.89, 0.89, 0.89)
-
-						#gera_Lista
-						self.indiceReverso = self.similar.verifica_similaridade_media_repetido(self.wordModel, indice.lower(), self.indiceReverso[indice.lower()+" _i"]['ID'], termos_similares, self.indiceReverso, self.dictMesh, dui)          
-					else:
-						self.add_IndiceReverso(indice, d['ID'], 0.99, 0.99, 4)
-				
+	def remover_acentos(self, txt):
+		return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')

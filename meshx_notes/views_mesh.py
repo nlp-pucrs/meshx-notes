@@ -53,7 +53,7 @@ class PacientePageView(TemplateView):
 			caminho_evolucao = './data/excel_evol.csv.gz'
 			caminho_dicionario = './data/dictMesh_.dict.gz'
 			caminho_indice = './data/indiceReversoPT.dict.gz'
-			caminho_valida = './data/dictValida.dict.gz'
+			caminho_valida = './data/dictValidaPT.dict.gz'
 			definicao = 'Definicao'
 			enviar = "Enviar"
 			html_semelhantes_inicio = '<br/><br/><strong>Termos Semelhantes</strong><br/>- '
@@ -62,11 +62,11 @@ class PacientePageView(TemplateView):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
 			caminho_dicionario = './data/dictMesh.dict_eng_.gz'
 			caminho_indice = './data/indiceReversoEN.dict.gz'
-			caminho_valida = './data/dictValida.dict.gz'
+			caminho_valida = './data/dictValidaEN.dict.gz'
 			definicao = 'Definition'
 			enviar = "Send"
 			html_semelhantes_inicio = '<br/><br/><strong>Similar Terms</strong><br/>- '
-			html_mesh_inicio = '<br/><br/><strong>Mesh Terms</strong><br/>- '
+			html_mesh_inicio = '<br/><br/><strong>Mesh Terms</strong>'
 
 
 		current_path = os.path.dirname(os.path.realpath(__file__))
