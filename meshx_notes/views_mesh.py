@@ -46,7 +46,9 @@ class PacientePageView(TemplateView):
 
 		val = self.request.GET.get('val')
 
-		if val == None or (val != '0' and val != '1'):
+		if val == None or val == '0':
+			val = '0'
+		else:
 			val = '1'
 
 		if(lingua == 'pt'):
@@ -57,7 +59,7 @@ class PacientePageView(TemplateView):
 			definicao = 'Definicao'
 			enviar = "Enviar"
 			html_semelhantes_inicio = '<br/><br/><strong>Termos Semelhantes</strong><br/>- '
-			html_mesh_inicio = '<br/><br/><strong>Termos Mesh</strong>'
+			html_mesh_inicio = '<br/><br/><strong>Termos Mesh</strong><br>- '
 		elif(lingua == 'en'):
 			caminho_evolucao = './data/excel_evol_eng.csv.gz'
 			caminho_dicionario = './data/dictMesh.dict_eng_.gz'
@@ -187,6 +189,10 @@ class PacientePageView(TemplateView):
 				verifica_mesh = 0
 				verifica_similar = 0 
 
+				html_similar = []
+				html_mesh = []
+				hidden = ""
+
 				if(ID in dictMesh):
 					term = dictMesh[ID]['terms']
 					html_mesh = []
@@ -196,15 +202,20 @@ class PacientePageView(TemplateView):
 						#if("hidden" in t):
 							#continue
 
-						if not("<i>" in t):
-							html_mesh.append(t)
-						else:
-							html_similar.append(t)
+						if not("hidden" in t):
+							if not("<i>" in t):
+								html_mesh.append(t)
+							else:
+								html_similar.append(t)
+
+						if("hidden" in t):
+							hidden = t
 
 
 				if(len(html_similar)!=0):
 					html_termos = html_semelhantes_inicio
 					html_termos += '<br/>- '.join(html_similar)+"</i>"
+					html_termos +=  hidden
 				else:
 					html_termos = ""
 				

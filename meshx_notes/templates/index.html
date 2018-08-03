@@ -150,12 +150,9 @@
           }
 
           ID = document.getElementsByName("ID")[0].value;
-          idioma = document.getElementsByName("idioma")[0].value;
+          idioma = document.getElementsByName("l")[0].value;
 
-
-          alert(serial)
-
-          $.get( "/valida?serial="+serial+"&ID="+ID+"&l="+idioma);
+          $.get( "/valida/?serial="+serial+"&ID="+ID+"&l="+idioma);
 
           alert("Enviado com sucesso, os dados serão atualizados na próxima sessão");
       }    

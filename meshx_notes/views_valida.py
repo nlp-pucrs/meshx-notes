@@ -40,13 +40,20 @@ class ValidaPageView(TemplateView):
 
 		import gzip, pickle
 
-		with gzip.open('dictValidaPT.dict.gz','wb') as fp:
+		with gzip.open('./meshx_notes/data/dictValidaPT.dict.gz','wb') as fp:
 			pickle.dump(dictValida,fp)
 			fp.close()
 
 
 	def get_context_data(self, **kwargs):
 		context = super(ValidaPageView, self).get_context_data(**kwargs)
+
+
+
+		context['eu'] = ""
+
+
+
 		current_path = os.path.dirname(os.path.realpath(__file__))
 
 		idioma  = self.request.GET.get('l')
@@ -63,6 +70,7 @@ class ValidaPageView(TemplateView):
 		caminho_dicionario = os.path.join(current_path, caminho_dicionario)
 		caminho_indice = os.path.join(current_path, caminho_indice)
 		caminho_valida = os.path.join(current_path, caminho_valida)
+
 
 		with gzip.open(caminho_indice,'rb') as fd:
 			indiceReverso = pickle.load(fd)
@@ -92,17 +100,24 @@ class ValidaPageView(TemplateView):
 				termos = ' '.join(dictMesh[ID]['terms'])
 
 				for indice in indiceReverso:
+					if indice == "tinham":
+						context['eu'] = "tinham"
+						break
 					if '_i' in indice:
 						val_valida = 2
 
 						new_indice = indice.replace(' _i', '')
+						#######3
+						new_indice = new_indice.replace('_', ' ')
 
-					if new_indice in ' '.join(dictMesh[ID]['terms']) and new_indice != '':
-						if new_indice in serial:
-							for palavra in posicoes:
-								if new_indice ==  palavra[:-2]:
-									val_valida =  palavra[-1:]
-									#context['eu'] = indice
+						if new_indice != '':
+							if new_indice in serial:
+								#if(new_indice == "tinham"):
+								#context['eu'] = new_indice
+								for palavra in posicoes:
+									if new_indice ==  palavra[:-2]:
+										val_valida =  palavra[-1:]
+										context['eu'] = palavra[:-2]
 
 
 									
@@ -113,13 +128,15 @@ class ValidaPageView(TemplateView):
 								'target': val_valida
 							}
 
-							context['eu'] = new_indice
+								
 							
 
 			#Salva o dicionario
 				with gzip.open(caminho_valida,'wb') as fp:
 					pickle.dump(dictValida,fp)
 					fp.close()
+		#self.zera_validaPT()
+
 
 		#Outro para teste
 		
