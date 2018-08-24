@@ -21,6 +21,8 @@ import unicodedata
 
 from django.views.generic import TemplateView
 
+import re
+
 
 #from .forms import valida
 
@@ -95,6 +97,35 @@ class PacientePageView(TemplateView):
 		m = prescription.loc[indice] 
 
 		evolucao = m['DADOS DA EVOLUÇÃO'].split(' ')
+
+		nfkd_form = unicodedata.normalize('NFKD', m['DADOS DA EVOLUÇÃO'])
+		aux = u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+		texto = re.sub('[^\w\s]','', aux)
+		evolucao = texto.split(' ');
+		evolucao_charespecial = m['DADOS DA EVOLUÇÃO'].split(' ');
+
+		for i in range(len(evolucao_charespecial)):
+			evolucao_charespecial[i] = re.sub(r'(\w)(\W)',r'\1 \2', evolucao_charespecial[i])
+			evolucao_charespecial[i]  = re.sub(r'(\W)(\w)',r'\1 \2', evolucao_charespecial[i])
+
+		for i in range(len(evolucao)):
+
+			confere = False
+
+			palavra = evolucao[i]
+
+			if(palavra != ' ' and palavra != ''):
+				evolucao[i] = palavra
+				if(palavra == evolucao_charespecial[i][0:-2] and palavra != evolucao_charespecial[i]):
+					evolucao[i] = evolucao[i]+' '+evolucao_charespecial[i][-1]
+				if(palavra == evolucao_charespecial[i][2:] and palavra != evolucao_charespecial[i]):
+					evolucao[i] = evolucao[i]+' '+evolucao_charespecial[i][0:1]
+			else:
+				evolucao[i] = evolucao_charespecial[i]
+
+		evolucao = ' '.join(evolucao)
+		evolucao = evolucao.split(' ');
 
 		#Abrindo o dicionario
 
