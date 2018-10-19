@@ -91,6 +91,8 @@ class Dicionarios():
 
 			start = time.time()
 
+			#definicao no idioma selecionado
+
 			self.seleciona_TermosMesh(qualifier, ID, heading, d)
 
 			end = time.time()
@@ -199,6 +201,47 @@ class Dicionarios():
 			}
 		return(lista_porcentagens)
 
+	def retira_especiaisHeading(self, termo):
+		INICIO = 0
+		FIM = termo.find('[')
+
+		return(termo[INICIO:FIM])
+
+	def muda_definicao(self, idioma, heading, ID):
+		if(idioma == "por"):
+				termo_xml = self.retira_especiaisHeading(heading.lower())
+				xmlMesh = './DECS_XML/'+termo_xml+'.xml'
+				print(xmlMesh)
+
+				definicao = self.pega_definicao_xml(xmlMesh, ID)
+				print("Definicao", definicao)
+				print("_______________")
+
+				if(definicao):
+					self.scope = definicao
+					return(True)
+				else:
+					return(False)
+		else:
+			return(False)
+
+	def pega_definicao_xml(self, xmlMesh, id_mesh):
+		try:
+			with open(xmlMesh, 'rb') as pordesc2018:
+				tree = ET.parse(pordesc2018)
+
+			for i, d in enumerate(tree.findall("./decsws_response/record_list")):
+				id_xml = d.find('.record/unique_identifier_nlm').text
+
+				#Pega as informações do xml do ID desejado
+				if(id_xml == id_mesh):
+					anotacao = d.find('.record/indexing_annotation').text
+					definicao = d.find('.record/definition/occ').attrib.get('n')
+
+					return(definicao)
+
+		except:
+			return("")
 
 	def verificaQualifier(self, d):
 		qualifier = '#'
@@ -238,11 +281,12 @@ class Dicionarios():
 			'qualifier': qualifier
 		}
 
-	def seleciona_TermosMesh(self, qualifier, ID, heading, descriptor):        
+	def seleciona_TermosMesh(self, qualifier, ID, heading, descriptor):
 		for c in descriptor.findall('.ConceptList/'):
 
-			if c.find('./ScopeNote') != None:
-				self.scope = c.find('./ScopeNote').text.replace('\n','').strip()
+			if not(self.muda_definicao(self.idioma, heading, ID)):
+				if c.find('./ScopeNote') != None:
+					self.scope = c.find('./ScopeNote').text.replace('\n','').strip()
 			for t in c.findall('./TermList/'):
 				if not(self.idioma in t.find('./TermUI').text) and self.idioma != "en":
 					continue
