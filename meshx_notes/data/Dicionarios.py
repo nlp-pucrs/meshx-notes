@@ -7,8 +7,11 @@ import unicodedata
 
 from unicodedata import normalize
 
-import gzip
+import gzip, pickle
 import xml.etree.ElementTree as ET
+
+import pandas as pd
+import os
 
 from Similaridade import Similaridade
 
@@ -27,8 +30,11 @@ class Dicionarios():
 	porcent_pharmacology = 0
 	_topn = 0
 	idioma=""
+	maisSimilar = True
+	MAIS_SIMILAR = 1
+	similaridadeDefinicao = False
         
-	def __init__(self, xmlMesh, wordEmbedding, idioma="por", porcent_methods=9, porcent_diagnosis=9, porcent_anatomy= 9, porcent_other=9, porcent_pharmacology=9.3, _topn=10, printTime=True):
+	def __init__(self, xmlMesh, wordEmbedding, maisSimilar, similaridadeDefinicao, idioma="por", porcent_methods=9, porcent_diagnosis=9, porcent_anatomy= 9, porcent_other=9, porcent_pharmacology=9.3, _topn=10, printTime=True):
 		self.xmlMesh = xmlMesh
 		self.wordEmbedding = wordEmbedding
 		self.printTime = printTime
@@ -40,6 +46,8 @@ class Dicionarios():
 		self.porcent_pharmacology = porcent_pharmacology
 		self._topn = _topn
 		self.idioma = idioma
+		self.maisSimilar = maisSimilar
+		self.similaridadeDefinicao = similaridadeDefinicao
 
 		with gzip.open(self.xmlMesh) as pordesc2018:
 			self.tree = ET.parse(pordesc2018)
@@ -62,7 +70,7 @@ class Dicionarios():
 
 			self.terms = []
 
-			ID = d.find('.DescriptorUI').text
+			ID =  	d.find('.DescriptorUI').text
 		    
 			start = time.time()
 
@@ -76,9 +84,6 @@ class Dicionarios():
 		    #Adicionando o heading inteiro no Mesh
 
 			start = time.time()
-
-			#self.add_IndiceReverso(self.remover_acentos(d.find('.DescriptorUI').text), heading)
-			#self.terms.append(self.remover_acentos(d.find('.DescriptorUI').text))
 
 			end = time.time()
 
@@ -104,6 +109,97 @@ class Dicionarios():
 		if(self.printTime):
 			return round(np.mean(time_qualifer), 5), round(np.mean(time_add_IndiceReverso), 5), round(np.mean(time_seleciona_TermosMesh), 5), round(np.mean(time_add_Mesh), 5)
 
+	def testaThresh(self):
+
+		current_path = os.path.dirname(os.path.realpath(__file__))
+		#caminho_padrao_ouro = './data/padrao_ouro.csv'
+		caminho_padrao_ouro = './padrao_ouro.csv'
+		caminho_padrao_ouro = os.path.join(current_path, caminho_padrao_ouro)
+
+		lista_porcentagens = {}
+
+		for i in range(20):
+			#Adicionando as porcentagens que variam de 0.01 em 0.01
+
+			DIAGNOSIS = 0
+			METHODS = 1
+			ANATOMY = 2
+			OTHER = 3
+			PHARMACOLOGY = 4
+
+			PORCENTAGEM = 0.80+(i*0.01)
+
+			self.porcent_methods = PORCENTAGEM
+			self.porcent_diagnosis = PORCENTAGEM
+			self.porcent_anatomy = PORCENTAGEM
+			self.porcent_other = PORCENTAGEM
+			self.porcent_pharmacology = PORCENTAGEM
+
+			certo = [0]*5
+			total =[0]*5
+
+			self.run()
+
+			padrao_ouro = pd.read_csv(caminho_padrao_ouro, nrows=50000)
+
+			#CONFERIR
+
+			for indice in self.indiceReverso:
+				try :
+					indice_teste = indice
+					if(' _i' in indice):
+						indice_teste = indice.replace(' _i', '')
+
+					ids_termos = padrao_ouro[padrao_ouro['Termos'] == indice_teste].index
+					termo = padrao_ouro.loc[ids_termos[0]]
+
+					if(self.dictMesh[self.indiceReverso[indice]['ID']]['qualifier'] == 'pharmacology'):
+						atual = PHARMACOLOGY
+					elif(self.dictMesh[self.indiceReverso[indice]['ID']]['qualifier'] == 'anatomy & histology'):
+						atual = ANATOMY
+					elif(self.dictMesh[self.indiceReverso[indice]['ID']]['qualifier'] == 'methods'):
+						atual = METHODS
+					elif(self.dictMesh[self.indiceReverso[indice]['ID']]['qualifier'] == 'diagnosis'):
+						atual = DIAGNOSIS
+					elif(self.dictMesh[self.indiceReverso[indice]['ID']]['qualifier'] == '#'):
+						atual = OTHER
+
+					if(self.indiceReverso[indice]['ID'] == str(termo['ID']) or self.indiceReverso[indice]['ID'] == str(termo['ID_2']) or self.indiceReverso[indice]['ID'] == str(termo['ID_3']) or self.indiceReverso[indice]['ID'] == str(termo['ID_4']) or  self.indiceReverso[indice]['ID'] == str(termo['ID_5'])):
+						certo[atual] +=1
+
+					total[atual] +=1
+				except IndexError:
+					continue
+			for i in range(5):
+				if(total[i] == 0):
+					total[i] = 1
+
+			acuracia_diagnosis = certo[DIAGNOSIS]/total[DIAGNOSIS]
+			acuracia_methods = certo[METHODS]/total[METHODS]
+			acuracia_anatomy = certo[ANATOMY]/total[ANATOMY]
+			acuracia_other = certo[OTHER]/total[OTHER]
+			acuracia_pharmacology = certo[PHARMACOLOGY]/total[PHARMACOLOGY]
+
+			lista_porcentagens[PORCENTAGEM]={
+				'acuracia diagnosis': acuracia_diagnosis,
+				'acuracia methods': acuracia_methods,
+				'acuracia anatomy': acuracia_anatomy,
+				'acuracia other': acuracia_other,
+				'acuracia pharmacology': acuracia_pharmacology,
+				'Total diagnosis': total[DIAGNOSIS],
+				'Total methods': total[METHODS],
+				'Total anatomy': total[ANATOMY],
+				'Total other': total[OTHER],
+				'Certo pharmacology': total[PHARMACOLOGY],
+				'Certo diagnosis': certo[DIAGNOSIS],
+				'Certo methods': certo[METHODS],
+				'Certo anatomy': certo[ANATOMY],
+				'Certo other': certo[OTHER],
+				'Certo pharmacology': certo[PHARMACOLOGY]
+			}
+		return(lista_porcentagens)
+
+
 	def verificaQualifier(self, d):
 		qualifier = '#'
 	
@@ -115,10 +211,23 @@ class Dicionarios():
 
 		return qualifier
 
-	def add_IndiceReverso(self, ID, termo):
-		self.indiceReverso[termo] = {
-			'ID': ID
-		} 
+	def add_IndiceReverso(self, ID, termo, similaridade, termo_adicionado):
+		if(self.comparaSimilaridade(similaridade, termo, termo_adicionado) or self.maisSimilar == False):
+			self.indiceReverso[termo] = {
+				'ID': ID,
+				'similaridade': similaridade
+			} 
+
+	def comparaSimilaridade(self, similaridade, termo, termo_adicionado):
+		termo = termo+" _i"
+
+		if (self.maisSimilar) and (termo in self.indiceReverso) and (self.indiceReverso[termo]['similaridade'] < similaridade) and (self.indiceReverso[termo]['ID'] in self.dictMesh) and (termo_adicionado in self.dictMesh[self.indiceReverso[termo]['ID']]['terms']) or not(termo in self.indiceReverso):
+			if termo in self.indiceReverso:
+				id_ = self.indiceReverso[termo]['ID']
+				self.dictMesh[id_]['terms'].remove(termo_adicionado)
+			return True
+		else:
+			return False
 
 	def add_Mesh(self, heading, ID, qualifier):
 		self.dictMesh[ID] = {
@@ -137,9 +246,11 @@ class Dicionarios():
 			for t in c.findall('./TermList/'):
 				if not(self.idioma in t.find('./TermUI').text) and self.idioma != "en":
 					continue
-				self.terms.append(t.find('./String').text)
 
-				self.add_IndiceReverso(self.remover_acentos(descriptor.find('.DescriptorUI').text), (t.find('./String').text.lower()))
+				termo_adicionado = t.find('./String').text
+				self.terms.append(termo_adicionado.lower())
+
+				self.add_IndiceReverso(self.remover_acentos(descriptor.find('.DescriptorUI').text), (t.find('./String').text.lower()), self.MAIS_SIMILAR, termo_adicionado)
 				
 				palavra_similar = []
 
@@ -154,25 +265,19 @@ class Dicionarios():
 
 						sem_assento = self.remover_acentos(palavra_similar)
 
-						if(porcentagem > self.porcent_anatomy and qualifier == 'anatomy & histology'):
-							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
-							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i")
+						if not(sem_assento in self.indiceReverso and self.indiceReverso[sem_assento]['similaridade'] == self.MAIS_SIMILAR) and not(sem_assento+'_i' in self.indiceReverso and self.indiceReverso[sem_assento+'_i']['similaridade'] == self.MAIS_SIMILAR):
 
-						elif(porcentagem > self.porcent_pharmacology and qualifier == 'pharmacology'):
-							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
-							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i")
+							teste_anatomy = porcentagem > self.porcent_anatomy and qualifier == 'anatomy & histology'
+							teste_pharmacology = porcentagem > self.porcent_pharmacology and qualifier == 'pharmacology'
+							teste_methods  = porcentagem > self.porcent_methods and qualifier == 'methods'
+							teste_diagnosis = porcentagem > self.porcent_diagnosis and qualifier == 'diagnosis'
+							teste_other = porcentagem > self.porcent_other
 
-						elif(porcentagem > self.porcent_methods and qualifier == 'methods'):
-							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
-							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i")
 
-						elif(porcentagem > self.porcent_diagnosis and qualifier == 'diagnosis'):
-							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
-							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i")
-
-						elif(porcentagem > self.porcent_other):
-							self.terms.append("<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>")
-							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i")
+							if(teste_anatomy or teste_pharmacology or teste_methods or teste_diagnosis or teste_other):
+								termo_adicionado = "<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>"
+								self.terms.append(termo_adicionado.lower())
+								self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i", porcentagem, termo_adicionado)
 
 	def seleciona_heading_primeiraParte(self, d):
 		heading = d.find('.DescriptorName/String').text.lower()
@@ -189,40 +294,37 @@ class Dicionarios():
 			indice = indice[:-1]
 
 		indice = self.remover_acentos(indice)
-		self.add_IndiceReverso(d.find('.DescriptorUI').text, self.remover_acentos(indice.lower()+" _i"))
+		termo_adicionado = self.remover_acentos(indice.lower())
+
+		self.add_IndiceReverso(d.find('.DescriptorUI').text, self.remover_acentos(indice.lower()+" _i"), self.MAIS_SIMILAR, termo_adicionado)
 		#self.terms.append("<i>"+indice+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+indice+"' value='1'/> Certo <input class='radio' type='radio' name='"+indice+"'' value='0'/> Errado</span>")
 
 		#terms.append(indice)
 
-		self.terms.append(" <input type='hidden' name='ID' value='"+d.find('.DescriptorUI').text+"'/> ")   
+		self.terms.append(" <input type='hidden' name='ID' value='"+d.find('.DescriptorUI').text+"'/> ".lower())   
 
 	def salvaIndiceReverso(self, nome):
-		import gzip, pickle
-
 		with gzip.open(nome,'wb') as fp:
 			pickle.dump(self.indiceReverso,fp)
 			fp.close()
 
 	def salvaDictMesh(self, nome):
-		import gzip, pickle
-
 		with gzip.open(nome,'wb') as fp:
 			pickle.dump(self.dictMesh,fp)
 			fp.close()
 
 	def carrega_Dicionario(self, nome):
-		import gzip, pickle
-
 		with gzip.open(nome, 'rb') as fp:
 			self.dictMesh = pickle.load(fp)
 			fp.close()
 
 	def carrega_IndiceReverso(self, nome):
-		import gzip, pickle
-
 		with gzip.open(nome, 'rb') as fp:
 			self.indiceReverso = pickle.load(fp)
 			fp.close()
 
 	def remover_acentos(self, txt):
 		return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
+
+	def remover_pontuacao(self, txt):
+		return re.sub('[^\w\s]','', txt)
