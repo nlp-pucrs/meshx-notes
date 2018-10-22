@@ -207,6 +207,7 @@ class Dicionarios():
 
 		return(termo[INICIO:FIM])
 
+	#No lugar da definição do MeSH será adicionada a que está no XML do termo no idioma desejado
 	def muda_definicao(self, idioma, heading, ID):
 		if(idioma == "por"):
 				termo_xml = self.retira_especiaisHeading(heading.lower())
@@ -225,6 +226,7 @@ class Dicionarios():
 		else:
 			return(False)
 
+	#Retorna a definição do ID informado, a qual está no XML
 	def pega_definicao_xml(self, xmlMesh, id_mesh):
 		try:
 			with open(xmlMesh, 'rb') as pordesc2018:
@@ -243,6 +245,7 @@ class Dicionarios():
 		except:
 			return("")
 
+	#Retorna o qualifier do termo desejado
 	def verificaQualifier(self, d):
 		qualifier = '#'
 	
@@ -261,6 +264,8 @@ class Dicionarios():
 				'similaridade': similaridade
 			} 
 
+	#Compara a similaidade de dois headings do dicionário (o atual e o que já estava, caso o mesmo termo já tenha sido processado)
+	#E retorna True se o atual for mais similar com o termo informado, False caso o que já estava for mais similar
 	def comparaSimilaridade(self, similaridade, termo, termo_adicionado):
 		termo = termo+" _i"
 
@@ -281,6 +286,7 @@ class Dicionarios():
 			'qualifier': qualifier
 		}
 
+	#Seleciona os termos do MeSH e salva os mesmos no dicionário, aqui também ocorre a chamada das funçõs de similaridade
 	def seleciona_TermosMesh(self, qualifier, ID, heading, descriptor):
 		for c in descriptor.findall('.ConceptList/'):
 
@@ -323,6 +329,7 @@ class Dicionarios():
 								self.terms.append(termo_adicionado.lower())
 								self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i", porcentagem, termo_adicionado)
 
+	#Pega o heading sem parenteses e conchetes, só o termo na lingua desejada, uma vez que entre parenteses/conchetes está o mesmo em inglês
 	def seleciona_heading_primeiraParte(self, d):
 		heading = d.find('.DescriptorName/String').text.lower()
 
