@@ -13,6 +13,8 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import os
 
+import re
+
 from Similaridade import Similaridade
 
 class Dicionarios():
@@ -33,7 +35,7 @@ class Dicionarios():
 	maisSimilar = True
 	MAIS_SIMILAR = 1
 	similaridadeDefinicao = False
-        
+
 	def __init__(self, xmlMesh, wordEmbedding, maisSimilar, similaridadeDefinicao, idioma="por", porcent_methods=9, porcent_diagnosis=9, porcent_anatomy= 9, porcent_other=9, porcent_pharmacology=9.3, _topn=10, printTime=True):
 		self.xmlMesh = xmlMesh
 		self.wordEmbedding = wordEmbedding
@@ -60,7 +62,6 @@ class Dicionarios():
 		time_seleciona_TermosMesh = []
 		time_add_Mesh = []
 		time_adiciona_termosPadrao_IndiceReverso = []
-
 
 		cont = 0
 
@@ -99,14 +100,21 @@ class Dicionarios():
 
 			time_seleciona_TermosMesh.append(end - start)
 
+			#print('seleciona_heading_primeiraParte')
 			self.seleciona_heading_primeiraParte(d)
+
+			self.adiciona_termos_WE(qualifier, d)
 
 			start = time.time()
 
-			self.add_Mesh(d.find('.DescriptorName/String').text.lower(), ID, qualifier )
+			#print("add_Mesh")
+			self.add_Mesh(d.find('.DescriptorName/String').text.lower(), ID, qualifier)
+
 
 			end = time.time()
 			time_add_Mesh.append(end - start)
+
+			#print("fim")
 
 		if(self.printTime):
 			return round(np.mean(time_qualifer), 5), round(np.mean(time_add_IndiceReverso), 5), round(np.mean(time_seleciona_TermosMesh), 5), round(np.mean(time_add_Mesh), 5)
@@ -209,14 +217,14 @@ class Dicionarios():
 
 	#No lugar da definição do MeSH será adicionada a que está no XML do termo no idioma desejado
 	def muda_definicao(self, idioma, heading, ID):
-		if(idioma == "por"):
+		if(idioma == "por" and self.similaridadeDefinicao):
 				termo_xml = self.retira_especiaisHeading(heading.lower())
 				xmlMesh = './DECS_XML/'+termo_xml+'.xml'
-				print(xmlMesh)
+				#print(xmlMesh)
 
 				definicao = self.pega_definicao_xml(xmlMesh, ID)
-				print("Definicao", definicao)
-				print("_______________")
+				#print("Definicao", definicao)
+				#print("_______________")
 
 				if(definicao):
 					self.scope = definicao
@@ -258,11 +266,62 @@ class Dicionarios():
 		return qualifier
 
 	def add_IndiceReverso(self, ID, termo, similaridade, termo_adicionado):
-		if(self.comparaSimilaridade(similaridade, termo, termo_adicionado) or self.maisSimilar == False):
+		compara_mais_similar = self.comparaSimilaridade(similaridade, termo, termo_adicionado) or self.maisSimilar == False
+		compara_definicao = self.similaridadeMedia_definicao(termo, similaridade) or self.similaridadeDefinicao == False
+
+		if(compara_mais_similar or compara_definicao):
 			self.indiceReverso[termo] = {
 				'ID': ID,
 				'similaridade': similaridade
 			} 
+
+	def similaridadeMedia_definicao(self, termo, similaridade_termo):
+		if(self.similaridadeDefinicao and termo in self.indiceReverso):
+			definicao_nova = self.remover_pontuacao(self.remover_acentos(self.scope)).split(' ')
+			similaridade_nova =  self.media_definicoes(definicao_nova, termo)
+
+			if(termo+' _i' in self.indiceReverso):
+				ID = self.indiceReverso[termo+' _i']
+			elif(termo in self.indiceReverso):
+				ID = self.indiceReverso[termo]
+			else:
+				return False
+
+			definicao_atual = self.remover_pontuacao(self.remover_acentos(self.scope)).split(' ')
+			similaridade_atual =  self.media_definicoes(definicao_atual, termo)
+
+			if(similaridade_nova > similaridade_atual):
+				return True
+		elif not(termo in self.indiceReverso):
+			return True
+
+		return False
+		
+
+	def media_definicoes(self, definicao, termo):
+		similaridade_definicao = 0
+		for palavra_definicao in definicao:
+			similaridade_definicao += self.comparaDoisTermos(palavra_definicao, termo)
+
+		media = similaridade_definicao/len(definicao)
+
+		return media
+
+
+	def comparaDoisTermos(self, termo_definicao, termo_MeSH):
+		if(termo_definicao == termo_MeSH):
+			return 1
+		else:
+			porcentagem_termo = 0
+			if(termo_MeSH in self.wordModel):
+				palavra_similar = self.wordModel.most_similar_cosmul(termo_MeSH,topn=20)
+
+				for similar, porcentagem in palavra_similar:
+					if(similar == termo_definicao and porcentagem > porcentagem_termo):
+						porcentagem_termo = porcentagem
+			return porcentagem_termo
+
+
 
 	#Compara a similaidade de dois headings do dicionário (o atual e o que já estava, caso o mesmo termo já tenha sido processado)
 	#E retorna True se o atual for mais similar com o termo informado, False caso o que já estava for mais similar
@@ -273,6 +332,7 @@ class Dicionarios():
 			if termo in self.indiceReverso:
 				id_ = self.indiceReverso[termo]['ID']
 				self.dictMesh[id_]['terms'].remove(termo_adicionado)
+				print("Estou aqui!")
 			return True
 		else:
 			return False
@@ -301,33 +361,37 @@ class Dicionarios():
 				self.terms.append(termo_adicionado.lower())
 
 				self.add_IndiceReverso(self.remover_acentos(descriptor.find('.DescriptorUI').text), (t.find('./String').text.lower()), self.MAIS_SIMILAR, termo_adicionado)
-				
-				palavra_similar = []
+
+				##add função AQUI
+
+	
+	def adiciona_termos_WE(self, qualifier, descriptor):
+		palavra_similar = []
+
+		for termo in self.terms:
+			if termo.lower() in self.wordModel.vocab:
+				sem_assento = self.remover_acentos(termo.lower())
+				#self.terms.append(sem_assento)
+
+				palavra_similar = self.wordModel.most_similar_cosmul(sem_assento.lower(),topn= self._topn)
+				for palavra_similar, porcentagem in palavra_similar:
+
+					sem_assento = self.remover_acentos(palavra_similar)
+
+					if not(sem_assento in self.indiceReverso and self.indiceReverso[sem_assento]['similaridade'] == self.MAIS_SIMILAR) and not(sem_assento+'_i' in self.indiceReverso and self.indiceReverso[sem_assento+'_i']['similaridade'] == self.MAIS_SIMILAR):
+
+						teste_anatomy = porcentagem > self.porcent_anatomy and qualifier == 'anatomy & histology'
+						teste_pharmacology = porcentagem > self.porcent_pharmacology and qualifier == 'pharmacology'
+						teste_methods  = porcentagem > self.porcent_methods and qualifier == 'methods'
+						teste_diagnosis = porcentagem > self.porcent_diagnosis and qualifier == 'diagnosis'
+						teste_other = porcentagem > self.porcent_other
 
 
-				if t.find('./String').text.lower() in self.wordModel.vocab:
-					sem_assento = self.remover_acentos(t.find('./String').text.lower())
-					#self.terms.append(sem_assento)
+						if(teste_anatomy or teste_pharmacology or teste_methods or teste_diagnosis or teste_other):
+							termo_adicionado = "<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>"
+							self.terms.append(termo_adicionado.lower())
+							self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i", porcentagem, termo_adicionado)
 
-
-					palavra_similar = self.wordModel.most_similar_cosmul(sem_assento.lower(),topn= self._topn)
-					for palavra_similar, porcentagem in palavra_similar:
-
-						sem_assento = self.remover_acentos(palavra_similar)
-
-						if not(sem_assento in self.indiceReverso and self.indiceReverso[sem_assento]['similaridade'] == self.MAIS_SIMILAR) and not(sem_assento+'_i' in self.indiceReverso and self.indiceReverso[sem_assento+'_i']['similaridade'] == self.MAIS_SIMILAR):
-
-							teste_anatomy = porcentagem > self.porcent_anatomy and qualifier == 'anatomy & histology'
-							teste_pharmacology = porcentagem > self.porcent_pharmacology and qualifier == 'pharmacology'
-							teste_methods  = porcentagem > self.porcent_methods and qualifier == 'methods'
-							teste_diagnosis = porcentagem > self.porcent_diagnosis and qualifier == 'diagnosis'
-							teste_other = porcentagem > self.porcent_other
-
-
-							if(teste_anatomy or teste_pharmacology or teste_methods or teste_diagnosis or teste_other):
-								termo_adicionado = "<i>"+palavra_similar+"</i>" + " <span class = 'valida'><input class='radio' type='radio' name='"+palavra_similar+"' value='1'/> Certo <input class='radio' type='radio' name='"+palavra_similar+"'' value='0'/> Errado</span>"
-								self.terms.append(termo_adicionado.lower())
-								self.add_IndiceReverso(descriptor.find('.DescriptorUI').text, sem_assento+" _i", porcentagem, termo_adicionado)
 
 	#Pega o heading sem parenteses e conchetes, só o termo na lingua desejada, uma vez que entre parenteses/conchetes está o mesmo em inglês
 	def seleciona_heading_primeiraParte(self, d):
@@ -365,14 +429,24 @@ class Dicionarios():
 			fp.close()
 
 	def carrega_Dicionario(self, nome):
-		with gzip.open(nome, 'rb') as fp:
-			self.dictMesh = pickle.load(fp)
-			fp.close()
+		try:
+			with gzip.open(nome, 'rb') as fp:
+				self.dictMesh = pickle.load(fp)
+				fp.close()
+
+			return True
+		except:
+			return False
+
 
 	def carrega_IndiceReverso(self, nome):
-		with gzip.open(nome, 'rb') as fp:
-			self.indiceReverso = pickle.load(fp)
-			fp.close()
+		try:
+			with gzip.open(nome, 'rb') as fp:
+				self.indiceReverso = pickle.load(fp)
+				fp.close()
+			return True
+		except:
+			return False
 
 	def remover_acentos(self, txt):
 		return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
