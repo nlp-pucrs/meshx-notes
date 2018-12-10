@@ -36,7 +36,7 @@ class Dicionarios():
 	MAIS_SIMILAR = 1
 	similaridadeDefinicao = False
 
-	def __init__(self, xmlMesh, wordEmbedding, maisSimilar, similaridadeDefinicao, idioma="por", porcent_methods=9, porcent_diagnosis=9, porcent_anatomy= 9, porcent_other=9, porcent_pharmacology=9.3, _topn=10, printTime=True):
+	def __init__(self, xmlMesh, wordEmbedding, idioma="por", porcent_methods=0.9, porcent_diagnosis=0.9,  porcent_pharmacology=0.93, porcent_anatomy= 0.9, porcent_other=0.9, _topn=10, printTime=True, maisSimilar=False, similaridadeDefinicao=False):
 		self.xmlMesh = xmlMesh
 		self.wordEmbedding = wordEmbedding
 		self.printTime = printTime
@@ -131,8 +131,13 @@ class Dicionarios():
 
 		padrao_ouro = pd.read_csv(caminho_padrao_ouro, nrows=50000)
 
+		pharmacology_total, anatomy_total, methods_total, diagnosis_total, other_total, total_termos_padraoOuro = self.conta_padrao_ouro_qualifiers()
+
 		for i in range(20):
 			#Adicionando as porcentagens que variam de 0.01 em 0.01
+
+			self.indiceReverso = {}
+			self.dictMesh = {}
 
 			DIAGNOSIS = 0
 			METHODS = 1
@@ -185,31 +190,108 @@ class Dicionarios():
 				if(total[i] == 0):
 					total[i] = 1
 
-			acuracia_diagnosis = certo[DIAGNOSIS]/total[DIAGNOSIS]
-			acuracia_methods = certo[METHODS]/total[METHODS]
-			acuracia_anatomy = certo[ANATOMY]/total[ANATOMY]
-			acuracia_other = certo[OTHER]/total[OTHER]
-			acuracia_pharmacology = certo[PHARMACOLOGY]/total[PHARMACOLOGY]
+			presicion_diagnosis = certo[DIAGNOSIS]/total[DIAGNOSIS]
+			presicion_methods = certo[METHODS]/total[METHODS]
+			presicion_anatomy = certo[ANATOMY]/total[ANATOMY]
+			presicion_other = certo[OTHER]/total[OTHER]
+			presicion_pharmacology = certo[PHARMACOLOGY]/total[PHARMACOLOGY]
+
+			recall_diagnosis = certo[DIAGNOSIS]/diagnosis_total
+			recall_methods = certo[METHODS]/methods_total
+			recall_anatomy = certo[ANATOMY]/anatomy_total
+			recall_other = certo[OTHER]/other_total
+			recall_pharmacology = certo[PHARMACOLOGY]/pharmacology_total
+
+			total_certo = certo[DIAGNOSIS] + certo[METHODS] + certo[ANATOMY] + certo[OTHER] + certo[PHARMACOLOGY]
+
+			acuracia = total_certo/total_termos_padraoOuro
 
 			lista_porcentagens[PORCENTAGEM]={
-				'acuracia diagnosis': acuracia_diagnosis,
-				'acuracia methods': acuracia_methods,
-				'acuracia anatomy': acuracia_anatomy,
-				'acuracia other': acuracia_other,
-				'acuracia pharmacology': acuracia_pharmacology,
+				'Acurácia': acuracia,
+
+				'Precision diagnosis': presicion_diagnosis,
+				'Reccal diagnosis': recall_diagnosis,
 				'Total diagnosis': total[DIAGNOSIS],
-				'Total methods': total[METHODS],
-				'Total anatomy': total[ANATOMY],
-				'Total other': total[OTHER],
-				'Total pharmacology': total[PHARMACOLOGY],
 				'Certo diagnosis': certo[DIAGNOSIS],
+
+				'Precision methods': presicion_methods,
+				'Recall methods': recall_methods,
+				'Total methods': total[METHODS],
 				'Certo methods': certo[METHODS],
+
+				'Precision anatomy': presicion_anatomy,
+				'Recall anatomy': recall_anatomy,
+				'Total anatomy': total[ANATOMY],
 				'Certo anatomy': certo[ANATOMY],
+
+				'Precision other': presicion_other,
+				'Recall other': recall_other,
+				'Total other': total[OTHER],
 				'Certo other': certo[OTHER],
+
+				'Precision pharmacology': presicion_pharmacology,
+				'Recall pharmacology': recall_pharmacology,
+				'Total pharmacology': total[PHARMACOLOGY],
 				'Certo pharmacology': certo[PHARMACOLOGY]
 			}
 
 		return(lista_porcentagens)
+
+	def conta_padrao_ouro_qualifiers(self):
+
+		pharmacology = anatomy = diagnosis = methods = other = 0
+
+		for indice in self.indiceReverso:
+			indice_teste = indice
+			if(' _i' in indice):
+				indice_teste = indice.replace(' _i', '')
+
+			ids_termos = padrao_ouro[padrao_ouro['Termos'] == indice_teste].index
+			termo = padrao_ouro.loc[ids_termos[0]]
+
+			if(str(termo['ID']) != "NULL"):
+				ID = str(termo['ID'])
+			elif(str(termo['ID_2']) != "NULL"):
+				ID = str(termo['ID_2'])
+			elif(str(termo['ID_3']) != "NULL"):
+				ID = str(termo['ID_3'])
+			elif(str(termo['ID_4']) != "NULL"):
+				ID = str(termo['ID_4'])
+			elif(str(termo['ID_5']) != "NULL"):
+				ID = str(termo['ID_5'])
+			else:
+				continue
+
+			if(self.dictMesh[ID]['qualifier'] == 'pharmacology'):
+				pharmacology += 1
+			elif(self.dictMesh[ID]['qualifier']['qualifier'] == 'anatomy & histology'):
+				anatomy += 1
+			elif(self.dictMesh[ID]['qualifier']['qualifier'] == 'methods'):
+				methods += 1
+			elif(self.dictMesh[ID]['qualifier']['qualifier'] == 'diagnosis'):
+				diagnosis += 1
+			elif(self.dictMesh[ID]['qualifier']['qualifier'] == '#'):
+				other += 1
+
+		total = pharmacology + anatomy + methods + diagnosis + other
+
+		if(pharmacology == 0):
+			pharmacology = 1
+		if(anatomy == 0):
+			anatomy = 1
+		if(methods == 0):
+			methods = 1
+		if(diagnosis == 0):
+			diagnosis = 1
+		if(other == 0):
+			other = 1
+
+		if(total == 0):
+			total = 1
+
+
+		return pharmacology, anatomy, methods, diagnosis, other, total
+
 
 	def retira_especiaisHeading(self, termo):
 		INICIO = 0
@@ -219,7 +301,8 @@ class Dicionarios():
 
 	#No lugar da definição do MeSH será adicionada a que está no XML do termo no idioma desejado
 	def muda_definicao(self, idioma, heading, ID):
-		if(idioma == "por" and self.similaridadeDefinicao):
+		#if(idioma == "por" and self.similaridadeDefinicao):
+		if(idioma == "por"):
 				termo_xml = self.retira_especiaisHeading(heading.lower())
 				xmlMesh = './DECS_XML/'+termo_xml+'.xml'
 				#print(xmlMesh)
@@ -247,7 +330,7 @@ class Dicionarios():
 
 				#Pega as informações do xml do ID desejado
 				if(id_xml == id_mesh):
-					anotacao = d.find('.record/indexing_annotation').text
+					#anotacao = d.find('.record/indexing_annotation').text
 					definicao = d.find('.record/definition/occ').attrib.get('n')
 
 					return(definicao)
@@ -267,39 +350,44 @@ class Dicionarios():
 
 		return qualifier
 
-	def add_IndiceReverso(self, ID, termo, similaridade, termo_adicionado):
-		compara_mais_similar = self.comparaSimilaridade(similaridade, termo, termo_adicionado)
-		compara_definicao = self.similaridadeMedia_definicao(termo, similaridade)
+	def add_IndiceReverso(self, ID, termo, similaridade, termo_no_dicionario):
+		#if(self.termo_original_ja_adicionado(termo)):
+			#return False
+
+		compara_mais_similar = self.comparaSimilaridade(similaridade, termo, termo_no_dicionario, False)
+		compara_definicao, similaridade = self.similaridadeMedia_definicao(termo, similaridade, termo_no_dicionario)
 		ultimo_encontrado =  self.maisSimilar == False and self.similaridadeDefinicao == False
 
-		if(compara_mais_similar or compara_definicao or ultimo_encontrado or similaridade):
+		if(compara_mais_similar or compara_definicao or ultimo_encontrado):
 			self.indiceReverso[termo] = {
 				'ID': ID,
 				'similaridade': similaridade
 			} 
 			return True
+		return False
 
-	def similaridadeMedia_definicao(self, termo, similaridade_termo):
-		if(self.similaridadeDefinicao and termo in self.indiceReverso):
+	def termo_original_ja_adicionado(self, termo):
+
+		if(termo in self.indiceReverso):
+			if(self.indiceReverso[termo]['similaridade'] == 1):
+				return True
+		return False
+
+	def similaridadeMedia_definicao(self, termo, similaridade_termo, termo_no_dicionario):
+		if(self.similaridadeDefinicao):
+
+			if(similaridade_termo == 1):
+				return True, similaridade_termo	
+
 			definicao_nova = self.remover_pontuacao(self.remover_acentos(self.scope)).split(' ')
 			similaridade_nova =  self.media_definicoes(definicao_nova, termo)
 
-			if(termo+' _i' in self.indiceReverso):
-				ID = self.indiceReverso[termo+' _i']
-			elif(termo in self.indiceReverso):
-				ID = self.indiceReverso[termo]
-			else:
-				return False
+			if(termo in self.indiceReverso):
 
-			definicao_atual = self.remover_pontuacao(self.remover_acentos(self.scope)).split(' ')
-			similaridade_atual =  self.media_definicoes(definicao_atual, termo)
+				if(self.comparaSimilaridade(similaridade_nova, termo, termo_no_dicionario, True)):
+					return True, similaridade_nova			
 
-			if(similaridade_nova > similaridade_atual):
-				return True
-		elif not(termo in self.indiceReverso):
-			return True
-
-		return False
+		return False, similaridade_termo
 		
 
 	def media_definicoes(self, definicao, termo):
@@ -321,7 +409,7 @@ class Dicionarios():
 				palavra_similar = self.wordModel.most_similar_cosmul(termo_MeSH,topn=20)
 
 				for similar, porcentagem in palavra_similar:
-					if(similar == termo_definicao and porcentagem > porcentagem_termo):
+					if(similar == termo_definicao and porcentagem_termo < porcentagem):
 						porcentagem_termo = porcentagem
 			return porcentagem_termo
 
@@ -329,22 +417,39 @@ class Dicionarios():
 
 	#Compara a similaidade de dois headings do dicionário (o atual e o que já estava, caso o mesmo termo já tenha sido processado)
 	#E retorna True se o atual for mais similar com o termo informado, False caso o que já estava for mais similar
-	def comparaSimilaridade(self, similaridade, termo, termo_adicionado):
-		#Condição para o if abaixo: and self.indiceReverso[termo]['ID'] in self.dictMesh) and  (termo_adicionado in self.dictMesh[self.indiceReverso[termo]['ID']]['terms'])
-		if ((self.maisSimilar) and (termo in self.indiceReverso) and (self.indiceReverso[termo]['similaridade'] < similaridade)) or not((termo in self.indiceReverso) and self.indiceReverso[termo]['similaridade']):
-			if termo in self.indiceReverso:
-				id_ = self.indiceReverso[termo]['ID']
-				if(id_ in self.dictMesh and termo in self.dictMesh[id_]['terms']):
-					self.dictMesh[id_]['terms'].remove(termo_adicionado)
-			return True
-		else:
-			return False
+	def comparaSimilaridade(self, similaridade, termo, termo_no_dicionario, aplicacao_auxiliar):
+		if(self.maisSimilar or aplicacao_auxiliar):
+			if(similaridade == 1):
+				#print("Termo:", termo, "----->", similaridade,"| Original!")
+				return True
+
+			if not(termo in self.indiceReverso):
+				#print("Termo:", termo, "----->", similaridade,"| Não estava no indiceReverso!")
+				return True
+
+			if(self.indiceReverso[termo]['similaridade'] < similaridade):
+				id_antigo = self.indiceReverso[termo]['ID']
+
+				#print(termo, similaridade)
+
+				if(id_antigo in self.dictMesh and termo in self.dictMesh[id_antigo]['terms']):
+					self.dictMesh[id_antigo]['terms'].remove(termo_no_dicionario)
+
+				#print("_________")
+
+				#print("Termo:", termo, "----->", similaridade,"| Similaridade anterior:", self.indiceReverso[termo]['similaridade'])
+				return True
+
+			if(self.indiceReverso[termo]['similaridade'] == similaridade):
+				print("Termo ----->", termo, similaridade,"| Tão similar quanto:", termo,  self.indiceReverso[termo]['similaridade'])
+		
+		return False
 
 	def add_Mesh(self, heading, ID, qualifier):
 		self.dictMesh[ID] = {
 			'ID': ID,
 			'name': heading,
-			'scope': self.scope,
+			'scope': self.scope.lower(),
 			'terms': sorted(set(self.terms), reverse=True),
 			'qualifier': qualifier
 		}
