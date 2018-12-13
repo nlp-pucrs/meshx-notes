@@ -131,8 +131,6 @@ class Dicionarios():
 
 		padrao_ouro = pd.read_csv(caminho_padrao_ouro, nrows=50000)
 
-		pharmacology_total, anatomy_total, methods_total, diagnosis_total, other_total, total_termos_padraoOuro = self.conta_padrao_ouro_qualifiers()
-
 		for i in range(20):
 			#Adicionando as porcentagens que variam de 0.01 em 0.01
 
@@ -157,6 +155,8 @@ class Dicionarios():
 			total =[0]*5
 
 			self.run()
+
+			pharmacology_total, anatomy_total, methods_total, diagnosis_total, other_total, total_termos_padraoOuro = self.conta_padrao_ouro_qualifiers()
 
 			#CONFERIR
 
@@ -206,48 +206,113 @@ class Dicionarios():
 
 			acuracia = total_certo/total_termos_padraoOuro
 
+			f1measure_diagnosis = 2*((presicion_diagnosis*recall_diagnosis)/(presicion_diagnosis+recall_diagnosis))
+			f1measure_methods = 2*((presicion_methods*recall_methods)/(presicion_methods+recall_methods))
+			f1measure_anatomy = 2*((presicion_anatomy*recall_anatomy)/(presicion_anatomy+recall_anatomy))
+			f1measure_other = 2*((presicion_other*recall_other)/(presicion_other+recall_other))
+			f1measure_pharmacology = 2*((presicion_pharmacology*recall_pharmacology)/(presicion_pharmacology+recall_pharmacology))
+
+
 			lista_porcentagens[PORCENTAGEM]={
-				'Acurácia': acuracia,
+				'0 Acurácia': acuracia,
 
-				'Precision diagnosis': presicion_diagnosis,
-				'Reccal diagnosis': recall_diagnosis,
-				'Total diagnosis': total[DIAGNOSIS],
-				'Certo diagnosis': certo[DIAGNOSIS],
+				'1.0 Precision diagnosis': presicion_diagnosis,
+				'1.1 Reccal diagnosis': recall_diagnosis,
+				'1.2 F1 score diagnosis': f1measure_diagnosis,
+				'1.3 Total diagnosis': total[DIAGNOSIS],
+				'1.4 Certo diagnosis': certo[DIAGNOSIS],
 
-				'Precision methods': presicion_methods,
-				'Recall methods': recall_methods,
-				'Total methods': total[METHODS],
-				'Certo methods': certo[METHODS],
+				'2.0 Precision methods': presicion_methods,
+				'2.1 Recall methods': recall_methods,
+				'2.2 F1 score methods': f1measure_methods,
+				'2.3 Total methods': total[METHODS],
+				'2.4 Certo methods': certo[METHODS],
 
-				'Precision anatomy': presicion_anatomy,
-				'Recall anatomy': recall_anatomy,
-				'Total anatomy': total[ANATOMY],
-				'Certo anatomy': certo[ANATOMY],
+				'3.0 Precision anatomy': presicion_anatomy,
+				'3.1 Recall anatomy': recall_anatomy,
+				'3.2 F1 score anatomy': f1measure_anatomy,
+				'3.3 Total anatomy': total[ANATOMY],
+				'3.4 Certo anatomy': certo[ANATOMY],
 
-				'Precision other': presicion_other,
-				'Recall other': recall_other,
-				'Total other': total[OTHER],
-				'Certo other': certo[OTHER],
+				'4.0 Precision other': presicion_other,
+				'4.1 Recall other': recall_other,
+				'4.2 F1 score other': f1measure_other,
+				'4.3 Total other': total[OTHER],
+				'4.4 Certo other': certo[OTHER],
 
-				'Precision pharmacology': presicion_pharmacology,
-				'Recall pharmacology': recall_pharmacology,
-				'Total pharmacology': total[PHARMACOLOGY],
-				'Certo pharmacology': certo[PHARMACOLOGY]
+				'5.0 Precision pharmacology': presicion_pharmacology,
+				'5.1 Recall pharmacology': recall_pharmacology,
+				'5.2 F1 score pharmacology': f1measure_pharmacology,
+				'5.3 Total pharmacology': total[PHARMACOLOGY],
+				'5.4 Certo pharmacology': certo[PHARMACOLOGY]
 			}
 
 		return(lista_porcentagens)
 
 	def conta_padrao_ouro_qualifiers(self):
 
-		pharmacology = anatomy = diagnosis = methods = other = 0
+		pharmacology = 0
+		anatomy = 0
+		diagnosis = 0
+		methods = 0
+		other = 0
+		total = 0
+		i=0
+		continua = True
 
-		for indice in self.indiceReverso:
-			indice_teste = indice
+		#Caminho
+		caminho_padrao_ouro = './padrao_ouro.csv'
+
+		#Pegando os dados
+		padrao_ouro = pd.read_csv(caminho_padrao_ouro, nrows=50000)
+
+		while(continua):
+    
+			try:
+				termo = str(padrao_ouro["Termos"][i]).split('\n')
+				termo = ''.join(termo)
+
+				cont = 0
+
+				for teste in padrao_ouro:
+					if(cont==0):
+						cont +=1
+						continue
+
+					linha = str(padrao_ouro[teste][i]).split('\n')
+
+					ID = linha[0]
+
+					if(ID != 'nan' and ID != "ambiguo"):
+						if(self.dictMesh[ID]['qualifier'] == 'pharmacology'):
+							pharmacology += 1
+						elif(self.dictMesh[ID]['qualifier'] == 'anatomy & histology'):
+							anatomy += 1
+						elif(self.dictMesh[ID]['qualifier'] == 'methods'):
+							methods += 1
+						elif(self.dictMesh[ID]['qualifier'] == 'diagnosis'):
+							diagnosis += 1
+						elif(self.dictMesh[ID]['qualifier'] == '#'):
+							other += 1
+
+						total += 1
+
+						break
+						
+				i +=1
+			except KeyError:
+				continua = False
+			    
+
+
+			'''indice_teste = indice
 			if(' _i' in indice):
 				indice_teste = indice.replace(' _i', '')
 
 			ids_termos = padrao_ouro[padrao_ouro['Termos'] == indice_teste].index
 			termo = padrao_ouro.loc[ids_termos[0]]
+
+			total += 1
 
 			if(str(termo['ID']) != "NULL"):
 				ID = str(termo['ID'])
@@ -264,16 +329,14 @@ class Dicionarios():
 
 			if(self.dictMesh[ID]['qualifier'] == 'pharmacology'):
 				pharmacology += 1
-			elif(self.dictMesh[ID]['qualifier']['qualifier'] == 'anatomy & histology'):
+			elif(self.dictMesh[ID]['qualifier'] == 'anatomy & histology'):
 				anatomy += 1
-			elif(self.dictMesh[ID]['qualifier']['qualifier'] == 'methods'):
+			elif(self.dictMesh[ID]['qualifier'] == 'methods'):
 				methods += 1
-			elif(self.dictMesh[ID]['qualifier']['qualifier'] == 'diagnosis'):
+			elif(self.dictMesh[ID]['qualifier'] == 'diagnosis'):
 				diagnosis += 1
-			elif(self.dictMesh[ID]['qualifier']['qualifier'] == '#'):
-				other += 1
-
-		total = pharmacology + anatomy + methods + diagnosis + other
+			elif(self.dictMesh[ID]['qualifier'] == '#'):
+				other += 1'''
 
 		if(pharmacology == 0):
 			pharmacology = 1
@@ -382,6 +445,9 @@ class Dicionarios():
 			definicao_nova = self.remover_pontuacao(self.remover_acentos(self.scope)).split(' ')
 			similaridade_nova =  self.media_definicoes(definicao_nova, termo)
 
+			if not(termo in self.indiceReverso):
+				return True, similaridade_nova
+
 			if(termo in self.indiceReverso):
 
 				if(self.comparaSimilaridade(similaridade_nova, termo, termo_no_dicionario, True)):
@@ -420,28 +486,18 @@ class Dicionarios():
 	def comparaSimilaridade(self, similaridade, termo, termo_no_dicionario, aplicacao_auxiliar):
 		if(self.maisSimilar or aplicacao_auxiliar):
 			if(similaridade == 1):
-				#print("Termo:", termo, "----->", similaridade,"| Original!")
 				return True
 
 			if not(termo in self.indiceReverso):
-				#print("Termo:", termo, "----->", similaridade,"| Não estava no indiceReverso!")
 				return True
 
 			if(self.indiceReverso[termo]['similaridade'] < similaridade):
 				id_antigo = self.indiceReverso[termo]['ID']
 
-				#print(termo, similaridade)
-
 				if(id_antigo in self.dictMesh and termo in self.dictMesh[id_antigo]['terms']):
 					self.dictMesh[id_antigo]['terms'].remove(termo_no_dicionario)
 
-				#print("_________")
-
-				#print("Termo:", termo, "----->", similaridade,"| Similaridade anterior:", self.indiceReverso[termo]['similaridade'])
 				return True
-
-			if(self.indiceReverso[termo]['similaridade'] == similaridade):
-				print("Termo ----->", termo, similaridade,"| Tão similar quanto:", termo,  self.indiceReverso[termo]['similaridade'])
 		
 		return False
 
