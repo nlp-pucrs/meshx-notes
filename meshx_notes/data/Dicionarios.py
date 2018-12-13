@@ -128,6 +128,8 @@ class Dicionarios():
 		caminho_padrao_ouro = os.path.join(current_path, caminho_padrao_ouro)
 
 		lista_porcentagens = {}
+		maior = [0]*5
+		total_maior = [0]*5
 
 		padrao_ouro = pd.read_csv(caminho_padrao_ouro, nrows=50000)
 
@@ -156,7 +158,7 @@ class Dicionarios():
 
 			self.run()
 
-			pharmacology_total, anatomy_total, methods_total, diagnosis_total, other_total, total_termos_padraoOuro = self.conta_padrao_ouro_qualifiers()
+			pharmacology_total, anatomy_total, methods_total, diagnosis_total, other_total, nan_total total_termos_padraoOuro = self.conta_padrao_ouro_qualifiers()
 
 			#CONFERIR
 
@@ -247,6 +249,28 @@ class Dicionarios():
 				'5.4 Certo pharmacology': certo[PHARMACOLOGY]
 			}
 
+			if(maior[DIAGNOSIS]>certo[DIAGNOSIS]):
+				maior[DIAGNOSIS] = certo[DIAGNOSIS]
+				total_maior[DIAGNOSIS] = total[DIAGNOSIS]
+			elif(maior[METHODS]>certo[METHODS]):
+				maior[METHODS] = certo[METHODS]
+				total_maior[METHODS] = total[METHODS]
+			elif(maior[ANATOMY]>certo[ANATOMY]):
+				maior[ANATOMY] = certo[ANATOMY]
+				total_maior[ANATOMY] = total[ANATOMY]
+			elif(maior[OTHER]>certo[OTHER]):
+				maior[OTHER] = certo[OTHER]
+				total_maior[OTHER] = total[OTHER]
+			elif(maior[PHARMACOLOGY]>certo[PHARMACOLOGY]):
+				maior[PHARMACOLOGY] = certo[PHARMACOLOGY]
+				total_maior[PHARMACOLOGY] = total[PHARMACOLOGY]
+
+		acuracia_melhor = maior[DIAGNOSIS] + maior[METHODS] + maior[ANATOMY] + maior[OTHER] + maior[PHARMACOLOGY]
+		acuracia_melhor = acuracia_melhor/total_termos_padraoOuro
+
+		lista_porcentagens[0] = {"Acurácia com os melhores limiares": acuracia_melhor}
+
+
 		return(lista_porcentagens)
 
 	def conta_padrao_ouro_qualifiers(self):
@@ -257,6 +281,7 @@ class Dicionarios():
 		methods = 0
 		other = 0
 		total = 0
+		nan = 0
 		i=0
 		continua = True
 
@@ -273,6 +298,7 @@ class Dicionarios():
 				termo = ''.join(termo)
 
 				cont = 0
+				nulo = 1
 
 				for teste in padrao_ouro:
 					if(cont==0):
@@ -297,46 +323,16 @@ class Dicionarios():
 
 						total += 1
 
+						nulo = 0
+
 						break
+				if(nulo == 1):
+					total += 1
+					nan += 1
 						
 				i +=1
 			except KeyError:
 				continua = False
-			    
-
-
-			'''indice_teste = indice
-			if(' _i' in indice):
-				indice_teste = indice.replace(' _i', '')
-
-			ids_termos = padrao_ouro[padrao_ouro['Termos'] == indice_teste].index
-			termo = padrao_ouro.loc[ids_termos[0]]
-
-			total += 1
-
-			if(str(termo['ID']) != "NULL"):
-				ID = str(termo['ID'])
-			elif(str(termo['ID_2']) != "NULL"):
-				ID = str(termo['ID_2'])
-			elif(str(termo['ID_3']) != "NULL"):
-				ID = str(termo['ID_3'])
-			elif(str(termo['ID_4']) != "NULL"):
-				ID = str(termo['ID_4'])
-			elif(str(termo['ID_5']) != "NULL"):
-				ID = str(termo['ID_5'])
-			else:
-				continue
-
-			if(self.dictMesh[ID]['qualifier'] == 'pharmacology'):
-				pharmacology += 1
-			elif(self.dictMesh[ID]['qualifier'] == 'anatomy & histology'):
-				anatomy += 1
-			elif(self.dictMesh[ID]['qualifier'] == 'methods'):
-				methods += 1
-			elif(self.dictMesh[ID]['qualifier'] == 'diagnosis'):
-				diagnosis += 1
-			elif(self.dictMesh[ID]['qualifier'] == '#'):
-				other += 1'''
 
 		if(pharmacology == 0):
 			pharmacology = 1
@@ -348,12 +344,13 @@ class Dicionarios():
 			diagnosis = 1
 		if(other == 0):
 			other = 1
-
+		if(nan == 0):
+			nan = 1
 		if(total == 0):
 			total = 1
 
 
-		return pharmacology, anatomy, methods, diagnosis, other, total
+		return pharmacology, anatomy, methods, diagnosis, other, nan, total
 
 
 	def retira_especiaisHeading(self, termo):
