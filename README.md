@@ -27,3 +27,6 @@ Como instanciar o projeto:
             "python manage.py runserver" 
             
             Se tiver ambas as versões (2.x e 3.x) usar: "python3 manage.py runserver"
+
+### PUCRS A.I. in HealthCare
+This project belongs to [GIAS at PUCRS, Brazil](http://www.inf.pucrs.br/ia-saude/)
